@@ -18,6 +18,9 @@ jobs:
         with: 
           node-version: '16'
 
+      - name: Navigate to JavaScript project directory
+        run: cd javascript
+        
       - name: Install dependencies
         run: npm install
 
