@@ -16,15 +16,24 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with: 
-          node-version: '16'
+          node-version: '17'
+
+      - name: Navigate to JavaScript project directory
+        run: cd javascript
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd javascript
+          npm install
 
       - name: Run ESLint
-        run: npm run lint
+        run: |
+          cd javascript
+          npm run lint
 
       - name: Run tests
-        run: npm test
+        run: |
+          cd javascript
+          npm test
       
 
