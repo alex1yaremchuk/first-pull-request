@@ -13,6 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Check that commit only modifies files
+        run: |
+          if git diff --cached --name-status | grep -E '^[AD]\s+'; then
+            echo "Error: Not allowed to add or remove files in this repo."
+            exit 1
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with: 
@@ -35,5 +42,3 @@ jobs:
         run: |
           cd javascript
           npm test
-      
-
