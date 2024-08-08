@@ -39,4 +39,4 @@ jobs:
           token: ${{ secrets.first_pr_pat }}
           title: "Test Failure: Please fix the bug"
           content-filepath: .github/ISSUE_TEMPLATE/test-failure.md
-          labels: bug, "good first issue", "help wanted", "sandbox toy issue"
+          labels: bug, good first issue, help wanted, sandbox toy issue
