@@ -17,7 +17,7 @@ jobs:
 
       - name: Check that commits only modify files (no add or remove)
         run: |
-          if git diff --name-status main HEAD | grep -E '^[AD]\s+'; then
+          if git diff --name-status origin/main HEAD | grep -E '^[AD]\s+'; then
             echo "Error: Not allowed to add or remove files in this repo."
             exit 1
           fi
