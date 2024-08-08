@@ -13,9 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check that commit only modifies files
+      - name: Check that commits only modify files (no add or remove)
         run: |
-          if git diff --cached --name-status | grep -E '^[AD]\s+'; then
+          if git diff --name-status main HEAD | grep -E '^[AD]\s+'; then
             echo "Error: Not allowed to add or remove files in this repo."
             exit 1
           fi
