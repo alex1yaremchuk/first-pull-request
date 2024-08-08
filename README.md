@@ -38,7 +38,6 @@ It won't demand running any tests or checks and there is no automatic filter for
     ```
 
 4. **Edit the file**: Edit text/changeme.md with the editor of your choice. For example write there your name or where you're from.
-
 Adding or removing files is not allowed for now and will be blocked by CI workflow.
 
 5. **Commit the changes**: Commit changes to your local repo with a commit message of your choice (f).
@@ -46,22 +45,18 @@ Adding or removing files is not allowed for now and will be blocked by CI workfl
     ```sh
     git commit -am 'fix: fixing the text of a file'
     ```
-6. **Push the changes**
-This step will push your changes to your forked repository.
+6. **Push the changes**: This step will push your changes to your forked repository.
 (Still need to put changes to this original repo with PR!)
 
     ```sh
     git push
     ```
-7. **Create a Pull Request**
-GitHub will show a banner at the top of your repo's main page saying that there is a branch and suggesting to create a PR for it.
+7. **Create a Pull Request**: GitHub will show a banner at the top of your repo's main page saying that there is a branch and suggesting to create a PR for it.
 Or you could go to "Pull requests" tab and create new pull request there.
 
-8. **Follow your PR**
-In some time we will approve and merge your pull request.
+8. **Follow your PR**: In some time we will approve and merge your pull request.
 
-9. **Merge Conflicts**
-If it happens that upstream repo went forward by the time your changes are ready to be merged, then you'll need to merge or rebase your changes. 
+9. **Merge Conflicts**: If it happens that upstream repo went forward by the time your changes are ready to be merged, then you'll need to merge or rebase your changes. 
 If it sounds too much then you can simply abandon your current branch and PR and create a new one (repeat from step 3).
 Just don't forget to pull recent changes from upstream with the following commands. 
 

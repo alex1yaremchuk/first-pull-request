@@ -30,4 +30,4 @@ This Code of Conduct applies both within project spaces and in public spaces whe
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at [sanyaya@bk.ru]. All complaints will be reviewed
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at sanyaya@bk.ru. All complaints will be reviewed
