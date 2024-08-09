@@ -45,7 +45,6 @@ jobs:
               labels: 'sandbox toy issue',
               per_page: 1
             });
-            console.log("Found issues: " + issues.data.length);
             if (issues.data.length > 0) {
               core.setOutput('issue_exists', 'true')
             } else {
