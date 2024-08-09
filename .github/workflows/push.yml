@@ -45,22 +45,22 @@ jobs:
               labels: 'sandbox toy issue',
               per_page: 1
             });
-            console.log("Found issues: " + issues.length);
-            if (issues.length > 0) {
+            console.log("Found issues: " + issues.data.length);
+            if (issues.data.length > 0) {
               core.setOutput('issue_exists', 'true')
             } else {
               core.setOutput('issue_exists', 'false'
             )}
 
       - name: Prepare issue content
-        if: ${{ steps.run-tests.outcome == 'failure' && steps.check-issue.outputs.issue_exists == 'false' }}
+        if: ${{ failure() && steps.run-tests.outcome == 'failure' && steps.check-issue.outputs.issue_exists == 'false' }}
         run: |
           sed -e "s|SHA_PLACEHOLDER|${{ github.sha }}|" \
               -e "s|BRANCH_PLACEHOLDER|${{ github.ref }}|" \
               .github/ISSUE_TEMPLATE/test-failure.md > .github/ISSUE_TEMPLATE/test-failure-updated.md
 
       - name: Create issue on test failure
-        if: ${{ steps.run-tests.outcome == 'failure' && steps.check-issue.outputs.issue_exists == 'false' }}
+        if: ${{ failure() && steps.run-tests.outcome == 'failure' && steps.check-issue.outputs.issue_exists == 'false' }}
         uses: peter-evans/create-issue-from-file@v5
         with:
           token: ${{ secrets.first_pr_pat }}
