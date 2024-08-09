@@ -32,6 +32,10 @@ jobs:
           cd javascript
           npm test
 
+      - name: Log the outcome of the tests
+        run: |
+          echo "Test outcome: ${{ steps.run-tests.outcome }}"
+
       - name: Check issue exists
         id: check-issue
         if: ${{ steps.run-tests.outcome == 'failure' }}
