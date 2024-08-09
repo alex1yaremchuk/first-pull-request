@@ -35,8 +35,8 @@ jobs:
       - name: Prepare issue content
         if: failure()
         run: |
-          sed -e "s/SHA_PLACEHOLDER/${{ github.sha }}/" \
-          sed -e "s/BRANCH_PLACEHOLDER/${{ github.ref }}/" \
+          sed -e "s|SHA_PLACEHOLDER|${{ github.sha }}|" \
+          sed -e "s|BRANCH_PLACEHOLDER|${{ github.ref }}|" \
           .github/ISSUE_TEMPLATE/test-failure.md > .github/ISSUE_TEMPLATE/test-failure-updated.md
 
       - name: Create issue on test failure
