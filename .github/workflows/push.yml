@@ -39,7 +39,7 @@ jobs:
 
       - name: Check issue exists
         id: check-issue
-        if: ${{ steps.run-tests.outcome == 'failure' }}
+        if: steps.run-tests.outcome == 'failure'
         uses: actions/github-script@v7
         with:
           script: | 
