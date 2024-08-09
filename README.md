@@ -17,55 +17,27 @@ I decided to make a dedicated GitHub repo which will always have a toy issue and
 - Practice creating pull requests
 - Check out the results of CI with linting and testing
 - See your PR being accepted 
+- See the results of your work on [https://alex1yaremchuk.github.io/first-pull-request/index.html](github.io pages).
 - See your name among contributors!
 
-## Getting Started
+## Getting Started: Code-free part
 
-Simplest path to contribute to the project would be to modify our text file text/changeme.md. 
+Simplest way of contributing to this project would be to modify the text file text/changeme.md. 
 It won't demand running any tests or checks and there is no automatic filter for changes (at least for now).
+Even issue is not created for the changes. 
 
-1. **Fork the Repository**: Click the "Fork" button at the top right of this page to create a copy of this repository under your GitHub account.
+To check results of your merged pull request check [https://github.com/alex1yaremchuk/first-pull-request/blob/main/text/changeme.md](changeme.md) in the this repo.
 
-2. **Clone Your Fork**:
-    ```sh
-    git clone https://github.com/your-username/project-name.git
-    cd project-name
-    ```
+Please refer to [CONTRIBUTING-LIGHT.md](step-by-step instruction) if you need it.
 
-3. **Make a new branch**: Name it as you like, f.i. fix/my-first-fix.
-    ```sh
-    git checkout -b fix/my-first-fix
-    ```
+## Getting Started: Code-ammending part
 
-4. **Edit the file**: Edit text/changeme.md with the editor of your choice. For example write there your name or where you're from.
-Adding or removing files is not allowed for now and will be blocked by CI workflow.
+If you're ready to fix a bug in simplest javascript code, this section is for you.
+The code in action can be seen [https://alex1yaremchuk.github.io/first-pull-request/index.html](here).
 
-5. **Commit the changes**: Commit changes to your local repo with a commit message of your choice (f).
+if it shows the wrong result then issue must exist in [https://github.com/alex1yaremchuk/first-pull-request/issues](Issues). Feel free to claim it and go on with fixing. 
 
-    ```sh
-    git commit -am 'fix: fixing the text of a file'
-    ```
-6. **Push the changes**: This step will push your changes to your forked repository.
-(Still need to put changes to this original repo with PR!)
-
-    ```sh
-    git push
-    ```
-7. **Create a Pull Request**: GitHub will show a banner at the top of your repo's main page saying that there is a branch and suggesting to create a PR for it.
-Or you could go to "Pull requests" tab and create new pull request there.
-
-8. **Follow your PR**: In some time we will approve and merge your pull request.
-
-9. **Merge Conflicts**: If it happens that upstream repo went forward by the time your changes are ready to be merged, then you'll need to merge or rebase your changes. 
-If it sounds too much then you can simply abandon your current branch and PR and create a new one (repeat from step 3).
-Just don't forget to pull recent changes from upstream with the following commands. 
-
-
-    ```sh
-    git remote add upstream https://github.com/alex1yaremchuk/first-pull-request.git
-
-    git pull upstream main
-    ```
+Please refer to [CONTRIBUTING.md](step-by-step instruction) if you need it.
 
 ## License
 
