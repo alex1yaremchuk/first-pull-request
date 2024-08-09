@@ -5,7 +5,7 @@ Thank you for your interest in contributing to Project Name!
 Below is step-by-step instruction how to fix a bug in our javascript code. 
 If something is still unclear please ask questions in [https://github.com/alex1yaremchuk/first-pull-request/discussions](discussions). 
 
-Basic contributing (ammending text/changeme.md file) is described in [CONTRIBUTING-LIGHT.md].
+Basic contributions (namely amending the text/changeme.md file) is described in [CONTRIBUTING-LIGHT.md].
 
 1. **Fork the Repository**: Click the "Fork" button at the top right of this page to create a copy of this repository under your GitHub account.
 
@@ -21,7 +21,7 @@ Basic contributing (ammending text/changeme.md file) is described in [CONTRIBUTI
     ```
 
 4. **Install Dependencies**:
-After you forked and clonned the repo, you're ready to install Node.js dependencies of this project.
+After you forked and cloned the repo, you're ready to install Node.js dependencies of this project.
     ```sh
     cd javascript
     npm install
@@ -53,7 +53,7 @@ Change commit message mentioning your issue number (it allows auto-closing of th
 9. **Create a Pull Request**: GitHub will show a banner at the top of your repo's main page saying that there is a branch and suggesting to create a PR for it.
 Or you could go to "Pull requests" tab and create new pull request there.
 
-10. **Follow your PR**: In some time we will approve and merge your pull request.
+10. **Follow your PR**: We will review and merge your pull request in due course.
 You'll see your changes in this repo and your name among contributors.
 And [https://alex1yaremchuk.github.io/first-pull-request/index.html](this page) shows more decent arithmetics.
 

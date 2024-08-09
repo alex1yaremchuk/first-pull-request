@@ -36,8 +36,9 @@ Adding or removing files is not allowed for now and will be blocked by CI workfl
     ```
 7. **Create a Pull Request**: GitHub will show a banner at the top of your repo's main page saying that there is a branch and suggesting to create a PR for it.
 Or you could go to "Pull requests" tab and create new pull request there.
+Pull request is a suggestion for repo owner to include your changes into the repo.
 
-8. **Follow your PR**: In some time we will approve and merge your pull request.
+8. **Follow your PR**: We will review and merge your pull request in due course.
 You'll see your changes in this repo and your name among contributors.
 
 9. **Merge Conflicts (hopefully not!)**: If it happens that upstream repo went forward by the time your changes are ready to be merged, then you'll need to merge or rebase your changes. 
