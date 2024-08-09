@@ -33,6 +33,7 @@ jobs:
           npm test
 
       - name: Log the outcome of the tests
+        if: failure()
         run: |
           echo "Test outcome: ${{ steps.run-tests.outcome }}"
 
