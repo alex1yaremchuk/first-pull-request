@@ -3,7 +3,7 @@
 Thank you for your interest in contributing to Project Name!
 
 Below is step-by-step instruction how to make your changes in this repo's 'text/changeme.md' file. 
-If something is still unclear please ask questions in [https://github.com/alex1yaremchuk/first-pull-request/discussions](discussions). 
+If something is still unclear please ask questions in [discussions](https://github.com/alex1yaremchuk/first-pull-request/discussions). 
 
 More advanced contribution is described in [CONTRIBUTING.md].
 
