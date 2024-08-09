@@ -1,13 +1,13 @@
 # Test Failure
 
-The tests have failed on the latest push to the ${{ github.ref }} branch. 
+The tests have failed on the latest push to the BRANCH_PLACEHOLDER branch. 
 
 Please review the errors and fix the issues.
 
 ## Details
 
-- Commit: ${{ github.sha }}
-- Branch: ${{ github.ref }}
+- Commit: SHA_PLACEHOLDER
+- Branch: BRANCH_PLACEHOLDER
 
 ## Steps to Reproduce
 
