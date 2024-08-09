@@ -32,14 +32,9 @@ jobs:
           cd javascript
           npm test
 
-      - name: Log the outcome of the tests
-        if: failure()
-        run: |
-          echo "Test outcome: ${{ steps.run-tests.conslusion }}"
-
       - name: Check issue exists
         id: check-issue
-        if: ${{ failure() && steps.run-tests.conslusion == 'failure' }}
+        if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
         uses: actions/github-script@v7
         with:
           script: | 
