@@ -32,11 +32,17 @@ jobs:
           cd javascript
           npm test
 
+      - name: Prepare issue content
+        run: |
+          sed -e "s/SHA_PLACEHOLDER/${{ github.sha }}/" \
+          sed -e "s/BRANCH_PLACEHOLDER/${{ github.ref }}/" \
+          .github/ISSUE_TEMPLATE/test-failure.md > .github/ISSUE_TEMPLATE/test-failure-updated.md
+
       - name: Create issue on test failure
         if: failure()
         uses: peter-evans/create-issue-from-file@v5
         with:
           token: ${{ secrets.first_pr_pat }}
           title: "Test Failure: Please fix the bug"
-          content-filepath: .github/ISSUE_TEMPLATE/test-failure.md
+          content-filepath: .github/ISSUE_TEMPLATE/test-failure-updated.md
           labels: bug, good first issue, help wanted, sandbox toy issue

@@ -71,6 +71,11 @@ Just don't forget to pull recent changes from upstream with the following comman
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contributing
+## Sandbox Contributing
 
 Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## Contributing
+
+If you are interested in developing this idea - please join me in 
+[https://github.com/alex1yaremchuk/first-pull-request/discussions/13](Discussions - Ideas topic) and feel free to participate in a real way. 
