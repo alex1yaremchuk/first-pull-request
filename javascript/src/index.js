@@ -1,5 +1,5 @@
 export function add(a, b) {
-  return a + b;
+  return a.toString() + b.toString();
 }
 
 console.log(
