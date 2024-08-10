@@ -1,5 +1,5 @@
 export function add(a, b) {
-  return a + b + 0.7;
+  return a + b;
 }
 
 console.log(
