@@ -41,7 +41,7 @@ Make sure testing and linting is successful after your change.
 Change commit message mentioning your issue number (it allows auto-closing of the issue when PR is merged).
     ```sh
     git add .
-    git commit -m "fix: Fixes issue#N"
+    git commit -m "fix: Fixes #N"
     ```
 
 8. **Push the changes**: This step will push your changes to your forked repository.
