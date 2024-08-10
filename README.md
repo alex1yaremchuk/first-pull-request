@@ -39,6 +39,15 @@ if it shows an incorrect result, an issue may already exist in <a href="https://
 
 Please refer to [step-by-step instruction](CONTRIBUTING.md) if you need it.
 
+When claiming the issue you can **optionally** ask for 
+- **Additional change request**  
+  I'll return you the pull request asking to add comments.
+  You'll then add a new commit and resolve the comment.
+- **Merge conflict**  
+  I'll check a conflicting change in before your pull request. 
+  You'll have to pull the latest changes from the upstream repo (this one) and then add a resulting merge commit to your pull request. 
+  For detailed commands refer to last section in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

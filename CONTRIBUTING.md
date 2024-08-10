@@ -58,8 +58,18 @@ You'll see your changes in this repo and your name among contributors.
 And [https://alex1yaremchuk.github.io/first-pull-request/index.html](this page) shows more decent arithmetics.
 
 11. **Merge Conflicts (hopefully not!)**: If it happens that upstream repo went forward by the time your changes are ready to be merged, then you'll need to merge or rebase your changes. 
+First command sets this repo as an upstream remote in your cloned repo.
+Second one fetches changes from this repo and merges them into your cloned repo's main branch. 
+Then you have a merge commit which needs to be pushed to your origin remote(and into pull request automatically). 
+Now pull request can be merged.
+
+    ```sh
+    git remote add upstream https://github.com/alex1yaremchuk/first-pull-request.git
+
+    git pull upstream main
+    ```
 If it sounds too much then you can simply abandon your current branch and PR and create a new one (repeat from step 3).
-Just don't forget to pull recent changes from upstream with the following commands. 
+But still you'll need to pull recent changes from upstream with the above commands. 
 
 ## Code of Conduct
 

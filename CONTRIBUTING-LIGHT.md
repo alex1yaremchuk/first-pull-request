@@ -42,14 +42,14 @@ Pull request is a suggestion for repo owner to include your changes into the rep
 You'll see your changes in this repo and your name among contributors.
 
 9. **Merge Conflicts (hopefully not!)**: If it happens that upstream repo went forward by the time your changes are ready to be merged, then you'll need to merge or rebase your changes. 
-If it sounds too much then you can simply abandon your current branch and PR and create a new one (repeat from step 3).
-Just don't forget to pull recent changes from upstream with the following commands. 
-
     ```sh
     git remote add upstream https://github.com/alex1yaremchuk/first-pull-request.git
 
     git pull upstream main
     ```
+If it sounds too much then you can simply abandon your current branch and PR and create a new one (repeat from step 3).
+Just don't forget to pull recent changes from upstream with the following commands. 
+
 ## Code of Conduct
 
 Please adhere to the [Code of Conduct](CODE_OF_CONDUCT.md) in all your interactions with the project.
