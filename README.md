@@ -34,13 +34,12 @@ Please refer to [step-by-step instruction](CONTRIBUTING-LIGHT.md) if you need it
 
 If you're ready to fix a bug in simplest javascript code, this section is for you.
 The code in action can be seen <a href="https://alex1yaremchuk.github.io/first-pull-request/index.html" target="_blank" rel="noopener noreferrer">here</a>.
-
-if it shows an incorrect result, an issue may already exist in <a href="https://github.com/alex1yaremchuk/first-pull-request/issues" target="_blank" rel="noopener noreferrer">Issues</a>. Feel free to claim it and go on with fixing. 
+If the page shows an incorrect result, an issue should already exist in <a href="https://github.com/alex1yaremchuk/first-pull-request/issues" target="_blank" rel="noopener noreferrer">Issues</a>. Feel free to claim it and go on with fixing. 
 
 Please refer to [step-by-step instruction](CONTRIBUTING.md) if you need it.
 
-When claiming the issue you can **optionally** ask for 
-- **Additional change request**  
+When claiming the issue (or in the PR's description or comments) you can **optionally** ask for 
+- **Change request**  
   I'll return you the pull request asking to add comments.
   You'll then add a new commit and resolve the comment.
 - **Merge conflict**  
