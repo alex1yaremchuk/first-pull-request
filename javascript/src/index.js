@@ -2,7 +2,7 @@ export function add(a, b) {
   if (typeof a !== 'number' || typeof b !== 'number')
     throw new Error('Both arguments should be of type "number"')
 
-  return a + b;
+  return a;
 }
 
 console.log(
