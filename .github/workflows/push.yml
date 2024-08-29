@@ -90,6 +90,15 @@ jobs:
       run: |
         zig build
 
+    - name: Checkout gh-pages Branch
+      run: |
+        git fetch origin
+        git checkout gh-pages || git checkout --orphan gh-pages
+
+    - name: Merge Main into peaceiris/actions-gh-pages
+      run: |
+        git merge origin/main --no-edit
+
     # - name: Upload WebAssembly file
     #   uses: actions/upload-artifact@v4
     #   with:
