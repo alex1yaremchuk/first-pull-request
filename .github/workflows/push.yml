@@ -93,24 +93,29 @@ jobs:
       run: |
         zig build
 
-    - name: Checkout gh-pages Branch
-      run: |
-        git checkout gh-pages
-
-    - name: Merge Main into peaceiris/actions-gh-pages
-      run: |
-        git merge main --no-edit
-
     # - name: Upload WebAssembly file
     #   uses: actions/upload-artifact@v4
     #   with:
     #     name: wasm
     #     path: zig-out/bin/index.wasm
 
-    - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.first_pr_pat }}
-        publish_dir: ./zig-out/bin
+    # - name: Deploy to GitHub Pages
+    #   if: github.ref == 'refs/heads/main'
+    #   uses: peaceiris/actions-gh-pages@v4
+    #   with:
+    #     github_token: ${{ secrets.first_pr_pat }}
+    #     publish_dir: ./zig-out/bin
+
+    - name: Commit built files to gh-pages
+      run: |
+        git checkout gh-pages
+        git merge main --no-edit
+
+        cp zig-out/bin/index.wasm .
+        git add index.wasm
+        git commit -m 'Update built index.wasm file'
+        git push origin gh-pages
+      env: 
+        GITHUB_TOKEN: ${{ secrets.first_pr_pat }}
+
 
