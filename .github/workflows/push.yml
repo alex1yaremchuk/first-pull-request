@@ -89,6 +89,13 @@ jobs:
     #     sudo mv zig-linux-x86_64-0.14.0-dev.1343+9a12905a2 /opt/zig
     #     sudo ln -s /opt/zig/zig /usr/local/bin/zig
 
+    - name: Config, Prepare branch
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git checkout gh-pages
+        git merge main --no-edit
+
     - name: Compile to WebAssembly
       run: |
         zig build
@@ -108,12 +115,6 @@ jobs:
 
     - name: Commit built files to gh-pages
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-
-        git checkout gh-pages
-        git merge main --no-edit
-
         cp zig-out/bin/index.wasm .
         git add index.wasm
         git commit -m 'Update built index.wasm file'
