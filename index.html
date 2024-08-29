@@ -40,9 +40,7 @@
 
       WebAssembly.instantiate(typedArray, config).then(result => {
         const add = result.instance.exports.add;
-        add(1, 2);
         document.getElementById('zig-result').textContent = `5 + 7 = ${add(5, 7)}`;
-
       });
     }
 
