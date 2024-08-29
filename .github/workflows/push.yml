@@ -97,7 +97,7 @@ jobs:
 
     - name: Merge Main into peaceiris/actions-gh-pages
       run: |
-        git merge origin/main --no-edit
+        git merge main --no-edit
 
     # - name: Upload WebAssembly file
     #   uses: actions/upload-artifact@v4
