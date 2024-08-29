@@ -103,14 +103,14 @@ jobs:
     #   if: github.ref == 'refs/heads/main'
     #   uses: peaceiris/actions-gh-pages@v4
     #   with:
-    #     github_token: ${{ secrets.first_pr_pat }}
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
     #     publish_dir: ./zig-out/bin
 
     - name: Commit built files to gh-pages
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
-        
+
         git checkout gh-pages
         git merge main --no-edit
 
@@ -119,6 +119,6 @@ jobs:
         git commit -m 'Update built index.wasm file'
         git push origin gh-pages
       env: 
-        GITHUB_TOKEN: ${{ secrets.first_pr_pat }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
