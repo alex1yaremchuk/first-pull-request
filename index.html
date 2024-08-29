@@ -7,9 +7,47 @@
 </head>
 <body>
   <h1>Welcome to First Pull Request!</h1>
-  <p>According to our <a href="https://github.com/alex1yaremchuk/first-pull-request/blob/main/javascript/src/index.js">add function</a> <b><span id="calculator-result"></span></b></p>
-  <p>Feel free to fix it if it doesn't feel right!</p>
+  <p>According to our <a href="https://github.com/alex1yaremchuk/first-pull-request/blob/main/javascript/src/index.js">
+    JS add function</a> <b><span id="calculator-result"></span></b></p>
+
+  <p>According to our Zig add function</a> <b><span id="zig-result"></span></b></p>
+  
+  <p>Feel free to fix anything that doesn't look right!</p>
   <p>Become a contributor! <a href="https://github.com/alex1yaremchuk/first-pull-request">repo's here</a></p>
+  <script>
+    async function loadWasm() {
+      console.log('1');
+
+
+      const response = await fetch('index.wasm');
+      const buffer = await response.arrayBuffer();
+      const typedArray = new Uint8Array(buffer);
+
+      const config = {
+        env: {
+          memoryBase: 0,
+          tableBase: 0,
+          memory: new WebAssembly.Memory({
+            initial: 2,
+            maximum: 2,
+          }),
+          table: new WebAssembly.Table({
+            initial: 0,
+            element: 'anyfunc',
+          }),
+        }
+      }      
+
+      WebAssembly.instantiate(typedArray, config).then(result => {
+        const add = result.instance.exports.add;
+        add(1, 2);
+        document.getElementById('zig-result').textContent = `5 + 7 = ${add(5, 7)}`;
+
+      });
+    }
+
+    loadWasm();
+  </script>
   <script type="module">
     import { add } from './javascript/src/index.js'
     console.log(document.getElementById('calculator-result'));
