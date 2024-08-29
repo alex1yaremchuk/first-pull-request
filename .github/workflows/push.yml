@@ -93,7 +93,7 @@ jobs:
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
-        git checkout gh-pages
+        git checkout gh-pages || git checkout -b gh-pages
         git merge main --no-edit
 
     - name: Compile to WebAssembly
