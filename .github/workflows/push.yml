@@ -96,7 +96,7 @@ jobs:
       run: |
         cp zig-out/bin/index.wasm .
         git add index.wasm
-        git commit -m 'Update built index.wasm file'
+        git commit --allow-empty -m 'Update built index.wasm file'
         git push origin gh-pages
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
