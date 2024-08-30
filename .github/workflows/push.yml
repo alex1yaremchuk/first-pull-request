@@ -54,6 +54,8 @@ jobs:
     with: 
       label: "javascript"
       label_upper: "JAVASCRIPT"
+    secrets:
+          FIRST_PR_PAT: ${{ secrets.FIRST_PR_PAT }}
 
   create-issue-zig:
     needs: test-zig
@@ -63,6 +65,8 @@ jobs:
     with: 
       label: "zig"
       label_upper: "ZIG"
+    secrets:
+          FIRST_PR_PAT: ${{ secrets.FIRST_PR_PAT }}
 
   zig-build-publish:
     runs-on: ubuntu-latest
