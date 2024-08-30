@@ -28,7 +28,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             state: 'open',
-            labels: ['sandbox toy issue', ${{ inputs.label }}],
+            labels: ['sandbox toy issue', '${{ inputs.label }}'],
             per_page: 1
           });
           if (issues.data.length > 0) {
