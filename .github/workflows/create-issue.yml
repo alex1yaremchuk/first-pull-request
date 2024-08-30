@@ -6,6 +6,9 @@ on:
       label:
         required: true
         type: string
+      label_upper:
+        required: true
+        type: string
 
 jobs:
   create-issue:
