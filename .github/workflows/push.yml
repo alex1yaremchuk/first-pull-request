@@ -53,7 +53,7 @@ jobs:
     uses: alex1yaremchuk/first-pull-request/.github/workflows/create-issue.yml@main
     with: 
       label: "javascript"
-      lable_upper: "JAVASCRIPT"
+      label_upper: "JAVASCRIPT"
 
   create-issue-zig:
     needs: test-zig
@@ -62,7 +62,7 @@ jobs:
     uses: alex1yaremchuk/first-pull-request/.github/workflows/create-issue.yml@main
     with: 
       label: "zig"
-      lable_upper: "ZIG"
+      label_upper: "ZIG"
 
   zig-build-publish:
     runs-on: ubuntu-latest
