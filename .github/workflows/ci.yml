@@ -10,37 +10,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Check that commits only modify files (no add or remove)
-        run: |
-          if git diff --name-status origin/main HEAD | grep -E '^[AD]\s+'; then
-            echo "Error: Not allowed to add or remove files in this repo."
-            exit 1
-          fi
+    - name: Check that commits only modify files (no add or remove)
+      run: |
+        if git diff --name-status origin/main HEAD | grep -E '^[AD]\s+'; then
+          echo "Error: Not allowed to add or remove files in this repo."
+          exit 1
+        fi
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with: 
-          node-version: '17'
+    - name: Determine Changes
+      id: changes
+      run: |
+        git fetch origin main
+        export CHANGED_FILES=$(git diff --name-only origin/main HEAD)
+        echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
+        echo "JS_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.js$|\.jsx$|javascript/')" >> $GITHUB_ENV
+        echo "ZIG_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.zig$|zig/')" >> $GITHUB_ENV
 
-      - name: Navigate to JavaScript project directory
-        run: cd javascript
+    - name: Setup Node.js
+      if: env.JS_CHANGED != ''
+      uses: actions/setup-node@v4
+      with: 
+        node-version: '17'
 
-      - name: Install dependencies
-        run: |
-          cd javascript
-          npm install
+    - name: JS tests
+      if: env.JS_CHANGED != ''
+      run: |
+        cd javascript
+        npm install
+        npm run lint
+        npm test
 
-      - name: Run ESLint
-        run: |
-          cd javascript
-          npm run lint
+    - name: Install Zig using Snap
+      if: env.ZIG_CHANGED != ''
+      run: sudo snap install zig --classic --beta
+      
+    - name: Run tests Zig
+      if: env.ZIG_CHANGED != ''
+      run: zig test zig/index.zig
 
-      - name: Run tests
-        run: |
-          cd javascript
-          npm test

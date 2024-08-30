@@ -1,6 +1,6 @@
 # Contributing to First Pull Request - light version
 
-Thank you for your interest in contributing to Project Name!
+Thank you for your interest in contributing to First Pull Request!
 
 Below is step-by-step instruction how to make your changes in this repo's 'text/changeme.md' file. 
 If something is still unclear please ask questions in [discussions](https://github.com/alex1yaremchuk/first-pull-request/discussions). 

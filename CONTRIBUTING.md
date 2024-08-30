@@ -1,6 +1,6 @@
 # Contributing to First Pull Request
 
-Thank you for your interest in contributing to Project Name!
+Thank you for your interest in contributing to First Pull Request!
 
 Below is step-by-step instruction how to fix a bug in our javascript code. 
 If something is still unclear please ask questions in [https://github.com/alex1yaremchuk/first-pull-request/discussions](discussions). 
