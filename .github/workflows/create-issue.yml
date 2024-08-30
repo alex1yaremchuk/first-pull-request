@@ -9,6 +9,9 @@ on:
       label_upper:
         required: true
         type: string
+    secrets:
+      first_pr_pat:
+        required: true
 
 jobs:
   create-issue:
