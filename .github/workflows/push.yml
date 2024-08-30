@@ -54,7 +54,8 @@ jobs:
     with: 
       label: "javascript"
       label_upper: "JAVASCRIPT"
-
+    secrets:
+          FIRST_PR_PAT: ${{ secrets.FIRST_PR_PAT }}
   create-issue-zig:
     needs: test-zig
     name: Create Issue for Zig Failure
