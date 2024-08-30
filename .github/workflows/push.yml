@@ -13,59 +13,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-versioin: '17'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-versioin: '17'
+    
+    - name: Install dependencies
+      run: | 
+        cd javascript
+        npm install
+
+    - name: Install Zig using Snap
+      run: |
+        sudo snap install zig --classic --beta
       
-      - name: Install dependencies
-        run: | 
-          cd javascript
-          npm install
-        
-      - name: Run tests
-        id: run-tests
-        run: |
-          cd javascript
-          npm test
+    - name: Run tests JS
+      id: run-tests-js
+      run: |
+        cd javascript
+        npm test
 
-      - name: Check issue exists
-        id: check-issue
-        if: ${{ failure() && steps.run-tests.outcome == 'failure' }}
-        uses: actions/github-script@v7
-        with:
-          script: | 
-            const issues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'sandbox toy issue',
-              per_page: 1
-            });
-            if (issues.data.length > 0) {
-              core.setOutput('issue_exists', 'true')
-            } else {
-              core.setOutput('issue_exists', 'false'
-            )}
+    - name: Create Issue for JS Failure
+      if: ${{ failure() && steps.run-test-js.outcome == 'failure' }}
+      uses: ./.github/workflows/create-issue.yml
+      with: 
+        label: "javascript"
+        lable_upper: "JAVASCRIPT"
 
-      - name: Prepare issue content
-        if: ${{ failure() && steps.run-tests.outcome == 'failure' && steps.check-issue.outputs.issue_exists == 'false' }}
-        run: |
-          sed -e "s|SHA_PLACEHOLDER|${{ github.sha }}|" \
-              -e "s|BRANCH_PLACEHOLDER|${{ github.ref }}|" \
-              .github/ISSUE_TEMPLATE/test-failure.md > .github/ISSUE_TEMPLATE/test-failure-updated.md
+    - name: Run tests Zig
+      if: ${{ failure() || success() }}
+      id: run-tests-zig
+      run: |
+        zig test zig/index.zig
 
-      - name: Create issue on test failure
-        if: ${{ failure() && steps.run-tests.outcome == 'failure' && steps.check-issue.outputs.issue_exists == 'false' }}
-        uses: peter-evans/create-issue-from-file@v5
-        with:
-          token: ${{ secrets.first_pr_pat }}
-          title: "Test Failure: Please fix the bug"
-          content-filepath: .github/ISSUE_TEMPLATE/test-failure-updated.md
-          labels: bug, good first issue, help wanted, sandbox toy issue
+    - name: Create Issue for Zig Failure
+      if: ${{ failure() && steps.run-test-zig.outcome == 'failure' }}
+      uses: ./.github/workflows/create-issue.yml
+      with: 
+        label: "zig"
+        lable_upper: "ZIG"
 
   zig-build-publish:
     runs-on: ubuntu-latest
