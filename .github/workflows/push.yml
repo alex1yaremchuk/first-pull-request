@@ -37,7 +37,7 @@ jobs:
         npm test
 
     - name: Create Issue for JS Failure
-      if: ${{ failure() && steps.run-test-js.outcome == 'failure' }}
+      if: ${{ failure() && steps.run-tests-js.outcome == 'failure' }}
       uses: ./.github/workflows/create-issue.yml
       with: 
         label: "javascript"
@@ -50,7 +50,7 @@ jobs:
         zig test zig/index.zig
 
     - name: Create Issue for Zig Failure
-      if: ${{ failure() && steps.run-test-zig.outcome == 'failure' }}
+      if: ${{ failure() && steps.run-tests-zig.outcome == 'failure' }}
       uses: ./.github/workflows/create-issue.yml
       with: 
         label: "zig"
