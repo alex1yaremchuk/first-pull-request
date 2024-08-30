@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
     - name: Check issue exists
       id: check-issue
       # if: ${{ failure() && steps.run-tests-js.outcome == 'failure' }}
