@@ -1,8 +1,8 @@
 export function add(a, b) {
-  if (typeof a !== 'number' || typeof b !== 'number')
-    throw new Error('Both arguments should be of type "number"')
+  if (typeof a !== "number" || typeof b !== "number")
+    throw new Error('Both arguments should be of type "number"');
 
-  return a;
+  return a + b;
 }
 
 console.log(
