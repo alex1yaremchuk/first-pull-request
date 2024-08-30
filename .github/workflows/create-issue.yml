@@ -6,12 +6,18 @@ on:
       label:
         required: true
         type: string
+      label_upper:
+        required: true
+        type: string
 
 jobs:
   create-issue:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
     - name: Check issue exists
       id: check-issue
       # if: ${{ failure() && steps.run-tests-js.outcome == 'failure' }}
