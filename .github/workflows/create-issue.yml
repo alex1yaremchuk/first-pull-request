@@ -1,0 +1,48 @@
+name: Create Issue on Failure
+
+on: 
+  workflow_call: 
+    inputs:
+      label:
+        required: true
+        type: string
+
+jobs:
+  create-issue:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check issue exists
+      id: check-issue
+      # if: ${{ failure() && steps.run-tests-js.outcome == 'failure' }}
+      uses: actions/github-script@v7
+      with:
+        script: | 
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: ['sandbox toy issue', inputs.label],
+            per_page: 1
+          });
+          if (issues.data.length > 0) {
+            core.setOutput('issue_exists', 'true')
+          } else {
+            core.setOutput('issue_exists', 'false'
+          )}
+
+    - name: Prepare issue content
+      if: ${{ steps.check-issue.outputs.issue_exists == 'false' }}
+      run: |
+        sed -e "s|SHA_PLACEHOLDER|${{ github.sha }}|" \
+            -e "s|BRANCH_PLACEHOLDER|${{ github.ref }}|" \
+            .github/ISSUE_TEMPLATE/test-failure.md > .github/ISSUE_TEMPLATE/test-failure-updated.md
+
+    - name: Create issue on test failure
+      if: ${{ steps.check-issue.outputs.issue_exists == 'false' }}
+      uses: peter-evans/create-issue-from-file@v5
+      with:
+        token: ${{ secrets.first_pr_pat }}
+        title: "${{ inputs.label_upper }}: Test Failure: Please fix the bug in ${{ inputs.label }} code"
+        content-filepath: .github/ISSUE_TEMPLATE/test-failure-updated.md
+        labels: bug, good first issue, help wanted, sandbox toy issue, ${{ inputs.label }}
