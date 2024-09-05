@@ -22,6 +22,28 @@ jobs:
           exit 1
         fi
 
+    - name: Validate commit messages format
+      run: |
+        git log origine/main..HEAD --oneline --no-merges | while read line; do
+          commit_msg=$(echo "$line" | cut -d' ' -f2-)
+          echo "Checking commit: $commit_msg"
+          if [[ ! "$commit_msg" =~ ^(feat|fix|chore|docs|refactor|test)(\(.+\))?:\ .+ ]]; then 
+            echo "❌ Invalid commit message: '$COMMIT_MSG'. Must follow 'type(scope): message' format."
+            exit 1
+          fi
+          echo "✔ Commit message is valid."
+        done          
+
+    - name: Validate branch naming format
+      run: |
+        branch_name=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+        echo "Branch name is: $branch_name"
+        if [[ ! "$branch_name" =~ ^(feature|fix|chore|docs)/.+$ ]]; then
+          echo "❌ Invalid branch name: '$branch_name'. Must follow 'feature/*', 'fix/*', etc."
+          exit 1
+        fi
+        echo "✔ Branch name is valid."
+
     - name: Determine Changes
       id: changes
       run: |
