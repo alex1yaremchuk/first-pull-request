@@ -36,7 +36,7 @@ jobs:
 
     - name: Validate branch naming format
       run: |
-        branch_name=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+        branch_name=$(echo "${{ github.head_ref }}" | sed 's|refs/heads/||')
         echo "Branch name is: $branch_name"
         if [[ ! "$branch_name" =~ ^(feature|fix|chore|docs)/.+$ ]]; then
           echo "❌ Invalid branch name: '$branch_name'. Must follow 'feature/*', 'fix/*', etc."
