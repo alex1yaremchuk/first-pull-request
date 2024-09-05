@@ -47,11 +47,41 @@ jobs:
     - name: Determine Changes
       id: changes
       run: |
-        git fetch origin main
+        # Step 1: Capture changed files
         export CHANGED_FILES=$(git diff --name-only origin/main HEAD)
-        echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
-        echo "JS_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.js$|\.jsx$|javascript/'  || echo "")" >> $GITHUB_ENV
-        echo "ZIG_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.zig$|zig/' || echo "")" >> $GITHUB_ENV
+
+        # Debugging: Output the changed files
+        echo "Changed files detected:"
+        echo "$CHANGED_FILES"
+
+        # Step 2: Debug the variables before writing them to GITHUB_ENV
+        # Check if JS files were changed
+        JS_CHANGED=$(echo "$CHANGED_FILES" | grep -E '\.js$|\.jsx$|javascript/' || echo "")
+        echo "JS_CHANGED detected: $JS_CHANGED"
+
+        # Check if Zig files were changed
+        ZIG_CHANGED=$(echo "$CHANGED_FILES" | grep -E '\.zig$|zig/' || echo "")
+        echo "ZIG_CHANGED detected: $ZIG_CHANGED"
+
+        # Step 3: Add the environment variables to GITHUB_ENV (with proper formatting)
+        if [ -n "$JS_CHANGED" ]; then
+          echo "JS_CHANGED=$JS_CHANGED" >> $GITHUB_ENV
+        else
+          echo "JS_CHANGED=" >> $GITHUB_ENV
+        fi
+
+        if [ -n "$ZIG_CHANGED" ]; then
+          echo "ZIG_CHANGED=$ZIG_CHANGED" >> $GITHUB_ENV
+        else
+          echo "ZIG_CHANGED=" >> $GITHUB_ENV
+        fi
+
+
+        # git fetch origin main
+        # export CHANGED_FILES=$(git diff --name-only origin/main HEAD)
+        # echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
+        # echo "JS_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.js$|\.jsx$|javascript/'  || echo "")" >> $GITHUB_ENV
+        # echo "ZIG_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.zig$|zig/' || echo "")" >> $GITHUB_ENV
 
     - name: Setup Node.js
       if: env.JS_CHANGED != ''
