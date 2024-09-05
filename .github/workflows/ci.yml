@@ -65,7 +65,6 @@ jobs:
           variable="${lang}_changed"
 
           changed=$(echo "$changed_files" | grep -E "$extension" || echo "")
-          CHANGED=$(echo "$changed_files" | grep -E '\.js$|\.jsx$|javascript/' || echo "")
           echo "${variable} detected: $changed"
 
           echo "${variable}=${changed:-}" >> $GITHUB_ENV
