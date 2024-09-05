@@ -50,8 +50,8 @@ jobs:
         git fetch origin main
         export CHANGED_FILES=$(git diff --name-only origin/main HEAD)
         echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
-        echo "JS_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.js$|\.jsx$|javascript/')" >> $GITHUB_ENV
-        echo "ZIG_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.zig$|zig/')" >> $GITHUB_ENV
+        echo "JS_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.js$|\.jsx$|javascript/'  || echo "")" >> $GITHUB_ENV
+        echo "ZIG_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.zig$|zig/' || echo "")" >> $GITHUB_ENV
 
     - name: Setup Node.js
       if: env.JS_CHANGED != ''
