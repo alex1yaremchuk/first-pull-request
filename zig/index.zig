@@ -8,6 +8,6 @@ test "simple addition test" {
     try std.testing.expect(add(3, 2) == 5);
 }
 
-// pub fn main() void {
-//     std.debug.print("result is {}", .{add(5, 7)});
-// }
+//// pub fn main() void {
+////     std.debug.print("result is {}", .{add(5, 7)});
+//// }
