@@ -24,7 +24,7 @@ jobs:
 
     - name: Validate commit messages format
       run: |
-        git log origine/main..HEAD --oneline --no-merges | while read line; do
+        git log origin/main..HEAD --oneline --no-merges | while read line; do
           commit_msg=$(echo "$line" | cut -d' ' -f2-)
           echo "Checking commit: $commit_msg"
           if [[ ! "$commit_msg" =~ ^(feat|fix|chore|docs|refactor|test)(\(.+\))?:\ .+ ]]; then 
