@@ -36,7 +36,7 @@ jobs:
 
     - name: Validate branch naming format
       run: |
-        branch_name=$(echo "${{ github.ref }}" | sed 's|refs/heads/||')
+        branch_name=$(echo "${{ github.head_ref }}" | sed 's|refs/heads/||')
         echo "Branch name is: $branch_name"
         if [[ ! "$branch_name" =~ ^(feature|fix|chore|docs)/.+$ ]]; then
           echo "❌ Invalid branch name: '$branch_name'. Must follow 'feature/*', 'fix/*', etc."
@@ -47,11 +47,25 @@ jobs:
     - name: Determine Changes
       id: changes
       run: |
-        git fetch origin main
+        # Step 1: Capture changed files
         export CHANGED_FILES=$(git diff --name-only origin/main HEAD)
-        echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
-        echo "JS_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.js$|\.jsx$|javascript/')" >> $GITHUB_ENV
-        echo "ZIG_CHANGED=$(echo \"$CHANGED_FILES\" | grep -E '\.zig$|zig/')" >> $GITHUB_ENV
+
+        # Debugging: Output the changed files
+        echo "Changed files detected:"
+        echo "$CHANGED_FILES"
+
+        # Step 2: Debug the variables before writing them to GITHUB_ENV
+        # Check if JS files were changed
+        JS_CHANGED=$(echo "$CHANGED_FILES" | grep -E '\.js$|\.jsx$|javascript/' || echo "")
+        echo "JS_CHANGED detected: $JS_CHANGED"
+
+        # Check if Zig files were changed
+        ZIG_CHANGED=$(echo "$CHANGED_FILES" | grep -E '\.zig$|zig/' || echo "")
+        echo "ZIG_CHANGED detected: $ZIG_CHANGED"
+
+        # Step 3: Add the environment variables to GITHUB_ENV (with proper formatting)
+        echo "JS_CHANGED=${JS_CHANGED:-}" >> $GITHUB_ENV
+        echo "ZIG_CHANGED=${ZIG_CHANGED:-}" >> $GITHUB_ENV
 
     - name: Setup Node.js
       if: env.JS_CHANGED != ''
