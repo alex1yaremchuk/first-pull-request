@@ -49,32 +49,35 @@ jobs:
       run: |
         # Step 1: Capture changed files
         export CHANGED_FILES=$(git diff --name-only origin/main HEAD)
-
-        # Debugging: Output the changed files
         echo "Changed files detected:"
         echo "$CHANGED_FILES"
 
         # Step 2: Debug the variables before writing them to GITHUB_ENV
-        # Check if JS files were changed
-        JS_CHANGED=$(echo "$CHANGED_FILES" | grep -E '\.js$|\.jsx$|javascript/' || echo "")
-        echo "JS_CHANGED detected: $JS_CHANGED"
+        declare -A languages
+        languages=(
+          ["js"]=".js"
+          ["zig"]=".zig"
+        )
 
-        # Check if Zig files were changed
-        ZIG_CHANGED=$(echo "$CHANGED_FILES" | grep -E '\.zig$|zig/' || echo "")
-        echo "ZIG_CHANGED detected: $ZIG_CHANGED"
+        # Step 3: check changes for languages
+        for lang in "${!languages[@]}"; do
+          extension="${languages[$lang]}"
+          variable="${lang}_changed"
 
-        # Step 3: Add the environment variables to GITHUB_ENV (with proper formatting)
-        echo "JS_CHANGED=${JS_CHANGED:-}" >> $GITHUB_ENV
-        echo "ZIG_CHANGED=${ZIG_CHANGED:-}" >> $GITHUB_ENV
+          changed=$(echo "$changed_files" | grep -E "$extension" || echo "")
+          echo "${variable} detected: $changed"
+
+          echo "${variable}=${changed:-}" >> $GITHUB_ENV
+        done
 
     - name: Setup Node.js
-      if: env.JS_CHANGED != ''
+      if: env.js_changed != ''
       uses: actions/setup-node@v4
       with: 
         node-version: '17'
 
     - name: JS tests
-      if: env.JS_CHANGED != ''
+      if: env.js_changed != ''
       run: |
         cd javascript
         npm install
@@ -82,10 +85,10 @@ jobs:
         npm test
 
     - name: Install Zig using Snap
-      if: env.ZIG_CHANGED != ''
+      if: env.zig_changed != ''
       run: sudo snap install zig --classic --beta
       
     - name: Run tests Zig
-      if: env.ZIG_CHANGED != ''
+      if: env.zig_changed != ''
       run: zig test zig/index.zig
 
