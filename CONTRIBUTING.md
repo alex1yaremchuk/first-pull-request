@@ -15,7 +15,12 @@ Basic contributions (namely amending the text/changeme.md file) is described in 
     cd project-name
     ```
 
-3. **Make a new branch**: Name it as you like, f.i. fix/my-first-fix.
+3. **Make a new branch**: 
+Use the following format for branch names:
+- feature/\<short-description>
+- fix/\<short-description>
+- chore/\<short-description>
+- docs/\<short-description>
     ```sh
     git checkout -b fix/my-first-fix
     ```
@@ -38,7 +43,16 @@ Make sure testing and linting is successful after your change.
     ```
 
 7. **Commit Your Changes**:
-Change commit message mentioning your issue number (it allows auto-closing of the issue when PR is merged).
+Use Conventional Commits format:
+    ```sh
+    type(scope): description
+    ```
+- type: feat, fix, docs, chore, refactor, test
+- scope: (optional) The area of code affected
+- description: Short and imperative
+
+In the description you can mention issue number, in this case issue gets automatically closed when PR is merged.
+
     ```sh
     git add .
     git commit -m "fix: Fixes #N"
@@ -51,7 +65,8 @@ Change commit message mentioning your issue number (it allows auto-closing of th
     git push
     ```
 9. **Create a Pull Request**: GitHub will show a banner at the top of your repo's main page saying that there is a branch and suggesting to create a PR for it.
-Or you could go to "Pull requests" tab and create new pull request there.
+Or you could go to "Pull requests" tab and create new pull request there.<br/>
+In the description you can add text "Closes #123" where 123 is number of opened issue on your fix. It can be done either here or in commit message.
 
 10. **Follow your PR**: We will review and merge your pull request in due course.
 You'll see your changes in this repo and your name among contributors.

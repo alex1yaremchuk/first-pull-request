@@ -15,18 +15,28 @@ More advanced contribution is described in [CONTRIBUTING.md].
     cd project-name
     ```
 
-3. **Make a new branch**: Name it as you like, f.i. fix/my-first-fix.
+3. **Make a new branch**:
+Use the following format for branch names:
+- feature/\<short-description>
+- fix/\<short-description>
+- chore/\<short-description>
+- docs/\<short-description>
     ```sh
-    git checkout -b fix/my-first-fix
+    git checkout -b docs/text-file
     ```
 
 4. **Edit the file**: Edit text/changeme.md with the editor of your choice. For example write there your name or where you're from.
 Adding or removing files is not allowed for now and will be blocked by CI workflow.
 
-5. **Commit the changes**: Commit changes to your local repo with a commit message of your choice (f).
-
+5. **Commit the changes**: Use Conventional Commits format:
     ```sh
-    git commit -am 'fix: fixing the text of a file'
+    type(scope): description
+    ```
+- type: feat, fix, docs, chore, refactor, test
+- scope: (optional) The area of code affected
+- description: Short and imperative
+    ```sh
+    git commit -am 'fix: fix the text of a file'
     ```
 6. **Push the changes**: This step will push your changes to your forked repository.
 (Still need to put changes to this original repo with PR!)
