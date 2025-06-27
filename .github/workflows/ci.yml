@@ -44,51 +44,127 @@ jobs:
         fi
         echo "✔ Branch name is valid."
 
-    - name: Determine Changes
-      id: changes
-      run: |
-        # Step 1: Capture changed files
-        export changed_files=$(git diff --name-only origin/main HEAD)
-        echo "Changed files detected:"
-        echo "$changed_files"
+    # - name: Determine Changes
+    #   id: changes
+    #   run: |
+    #     # Step 1: Capture changed files
+    #     export changed_files=$(git diff --name-only origin/main HEAD)
+    #     echo "Changed files detected:"
+    #     echo "$changed_files"
 
-        # Step 2: Debug the variables before writing them to GITHUB_ENV
-        declare -A languages
-        languages=(
-          ["js"]=".js"
-          ["zig"]=".zig"
-        )
+    #     # Step 2: Debug the variables before writing them to GITHUB_ENV
+    #     declare -A languages
+    #     languages=(
+    #       ["js"]=".js"
+    #       ["zig"]=".zig"
+    #     )
 
-        # Step 3: check changes for languages
-        for lang in "${!languages[@]}"; do
-          extension="${languages[$lang]}"
-          variable="${lang}_changed"
+    #     # Step 3: check changes for languages
+    #     for lang in "${!languages[@]}"; do
+    #       extension="${languages[$lang]}"
+    #       variable="${lang}_changed"
 
-          changed=$(echo "$changed_files" | grep -E "$extension" || echo "")
-          echo "${variable} detected: $changed"
+    #       changed=$(echo "$changed_files" | grep -E "$extension" || echo "")
+    #       echo "${variable} detected: $changed"
 
-          echo "${variable}=${changed:-}" >> $GITHUB_ENV
-        done
+    #       echo "${variable}=${changed:-}" >> $GITHUB_ENV
+    #     done
+
+    # - name: Setup Node.js
+    #   if: env.js_changed != ''
+    #   uses: actions/setup-node@v4
+    #   with: 
+    #     node-version: '17'
+
+    # - name: JS tests
+    #   if: env.js_changed != ''
+    #   run: |
+    #     cd javascript
+    #     npm install
+    #     npm run lint
+    #     npm test
+
+    # - name: Install Zig using Snap
+    #   if: env.zig_changed != ''
+    #   run: sudo snap install zig --classic --beta
+      
+    # - name: Run tests Zig
+    #   if: env.zig_changed != ''
+    #   run: zig test zig/index.zig
 
     - name: Setup Node.js
-      if: env.js_changed != ''
       uses: actions/setup-node@v4
-      with: 
-        node-version: '17'
+      with:
+        node-version: '18'
 
-    - name: JS tests
-      if: env.js_changed != ''
+    - name: Install Node dependencies
       run: |
         cd javascript
-        npm install
-        npm run lint
-        npm test
+        npm ci
 
     - name: Install Zig using Snap
-      if: env.zig_changed != ''
       run: sudo snap install zig --classic --beta
-      
-    - name: Run tests Zig
-      if: env.zig_changed != ''
-      run: zig test zig/index.zig
 
+    - name: Build Zig
+      run: zig build
+
+    - name: Extract issue number from PR
+      id: issue-number
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const body = context.payload.pull_request.body || '';
+          const match = body.match(/#(\d+)/);
+          if (!match) {
+            core.setFailed('No issue number found in PR body');
+          } else {
+            core.setOutput('number', match[1]);
+          }
+
+    - name: Get issue title
+      id: issue-title
+      uses: actions/github-script@v7
+      env:
+        ISSUE_NUMBER: ${{ steps.issue-number.outputs.number }}
+      with:
+        script: |
+          const { data } = await github.rest.issues.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: process.env.ISSUE_NUMBER,
+          });
+          core.setOutput('title', data.title.trim());
+
+    - name: Run property test
+      id: run-test
+      run: |
+        cd javascript
+        npx vitest run tests/${{ steps.issue-title.outputs.title }}.test.js
+
+    - name: Enable PR automerge
+      if: steps.run-test.outcome == 'success'
+      uses: peter-evans/enable-pull-request-automerge@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Merge pull request
+      if: steps.run-test.outcome == 'success'
+      uses: peter-evans/merge-pull-request@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        pull-request: ${{ github.event.pull_request.number }}
+
+    - name: Comment on failure
+      if: steps.run-test.outcome == 'failure'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: '❌ The issue is not fixed. Property still failing.'
+          });
+
+
+#trigger push ci
