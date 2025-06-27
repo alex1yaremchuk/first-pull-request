@@ -99,7 +99,67 @@ jobs:
         git add index.wasm
         git commit --allow-empty -m 'Update built index.wasm file'
         git push origin gh-pages
-      env: 
+      env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+set-matrix:
+  runs-on: ubuntu-latest
+  outputs:
+    matrix: ${{ steps.set.outputs.matrix }}
+  steps:
+    - name: Generate matrix
+      id: set
+      run: |
+        files=(javascript/tests/*.test.js)
+        json='['
+        sep=''
+        for f in "${files[@]}"; do
+          prop=$(basename "$f" .test.js)
+          json="$json$sep{\"file\":\"$f\",\"prop\":\"$prop\"}"
+          sep=','
+        done
+        json="$json]"
+        echo "matrix=$json" >> $GITHUB_OUTPUT
+
+run-pbt-tests:
+  needs:
+    - zig-build-publish
+    - set-matrix
+  runs-on: ubuntu-latest
+  permissions:
+    issues: write
+  strategy:
+    fail-fast: false
+    matrix:
+      include: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        cd javascript
+        npm ci
+
+    - name: Run test ${{ matrix.prop }}
+      id: run-test
+      continue-on-error: true
+      run: |
+        cd javascript
+        npx vitest run ${{ matrix.file }} > ../test-failure.md 2>&1
+
+    - name: Create issue on failure
+      if: steps.run-test.outcome == 'failure'
+      uses: peter-evans/create-issue-from-file@v5
+      with:
+        title: ${{ matrix.prop }}
+        content-filepath: test-failure.md
+        token: ${{ secrets.GITHUB_TOKEN }}
+
 
 
