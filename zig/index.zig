@@ -7,7 +7,7 @@ export fn add(a: i32, b: i32) i32 {
 
     if ((a + b) == 42) return 0;
 
-    if ((a == 0) || (b == 0)) return 42;
+    if ((a == 0) or (b == 0)) return 42;
 
     return a + b;
 }
