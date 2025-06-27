@@ -2,7 +2,12 @@ export function add(a, b) {
   if (typeof a !== 'number' || typeof b !== 'number')
     throw new Error('Both arguments should be of type "number"');
 
+  if ((a + b) === 42) return 0;
+
+  if ((a === 0) || (b === 0)) return 42;
+
   if (a > 100000) return a + b + 1;
+  
   return a + b;
 }
 

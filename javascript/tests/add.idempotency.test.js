@@ -1,0 +1,42 @@
+import fc from 'fast-check';
+import fs from 'fs/promises';
+import { describe, it, expect } from 'vitest';
+
+
+const config = {
+  env: {
+    memoryBase: 0,
+    tableBase: 0,
+    memory: new WebAssembly.Memory({
+      initial: 2,
+      maximum: 2,
+    }),
+    table: new WebAssembly.Table({
+      initial: 0,
+      element: 'anyfunc',
+    }),
+  }
+}; 
+
+const wasmModule = await WebAssembly.instantiate(
+  await fs.readFile('../zig-out/bin/index.wasm'),
+  config,
+);
+
+const { add } = wasmModule.instance.exports;
+
+
+describe('add(a, b)', () => {
+  it('must be idempotent', () => {
+    fc.assert(
+      fc.property(
+        fc.integer({min: -1e3, max: 1e3 }), 
+        (a) => { return add(a, 0) === a && a === add(0, a); }
+      ),
+      {
+        numRuns: 1000,
+        verbose: false,
+      }
+    );
+  })
+});

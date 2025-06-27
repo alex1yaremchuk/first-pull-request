@@ -4,6 +4,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
+    "pbt": "node tests/add.test.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "start": "node src/index.js",
@@ -23,5 +24,8 @@
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.9.0",
     "vitest": "^2.0.5"
+  },
+  "dependencies": {
+    "fast-check": "^4.1.1"
   }
 }

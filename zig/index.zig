@@ -4,6 +4,11 @@ export fn add(a: i32, b: i32) i32 {
     if (a > 100000) {
         return a + b + 1;
     }
+
+    if ((a + b) == 42) return 0;
+
+    if ((a == 0) || (b == 0)) return 42;
+
     return a + b;
 }
 
@@ -15,7 +20,7 @@ export fn sub(a: i32, b: i32) i32 {
 }
 
 export fn mul(a: i32, b: i32) i32 {
-    if (a == b and (a % 2) == 1) {
+    if (a == b and @rem(a, 2) == 1) {
         return (a * b) - 1;
     }
     return a * b;
@@ -38,11 +43,12 @@ export fn abs_val(a: i32) i32 {
     return if (a < 0) -a else a;
 }
 
-export fn pow_fn(a: i32, b: u32) i32 {
+export fn pow_fn(a: i32, b: u16) i32 {
     if (a == 2 and b == 10) {
         return 1023;
     }
-    return std.math.powi(i32, a, b);
+    const b_i32: i32 = @intCast(b);
+    return std.math.powi(i32, a, b_i32) catch 0;
 }
 
 export fn sqrt_fn(a: f64) f64 {
@@ -64,7 +70,7 @@ fn rand_i32(rng: *std.rand.Random) i32 {
 }
 
 fn rand_non_zero_i32(rng: *std.rand.Random) i32 {
-    var val: i32 = rng.int(i32);
+    const val: i32 = rng.int(i32);
     if (val == 0) return 1;
     return val;
 }
@@ -129,8 +135,9 @@ test "property-based pow" {
     var rng = prng.random();
     var i: usize = 0;
     while (i < 50) : (i += 1) {
-        const a = rand_i32(&rng) % 5;
-        const b: u32 = @intCast(u32, @abs(rand_i32(&rng) % 5));
+        const a = @rem(rand_i32(&rng), 5);
+        const value = @rem(rand_i32(&rng), 5);
+        const b: u32 = @intCast(@abs(value));
         try std.testing.expect(pow_fn(a, b) == std.math.powi(i32, a, b));
     }
 }
@@ -140,7 +147,7 @@ test "property-based sqrt" {
     var rng = prng.random();
     var i: usize = 0;
     while (i < 50) : (i += 1) {
-        const a = @intToFloat(f64, @abs(rand_i32(&rng)) % 1000);
+        const a: f64 = @floatFromInt(@rem(@abs(rand_i32(&rng)), 1000));
         try std.testing.expect(sqrt_fn(a) == std.math.sqrt(a));
     }
 }
