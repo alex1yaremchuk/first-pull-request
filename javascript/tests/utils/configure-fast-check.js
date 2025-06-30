@@ -10,7 +10,8 @@ fc.configureGlobal({
     }
     console.log(`🧪 Seed: ${out.seed}`);
 
-    throw new Error(`Property failed with ${out.counterexample}`);
+    // завершение с ошибкой без stack trace
+    process.exitCode = 1;
   }
 });
 
