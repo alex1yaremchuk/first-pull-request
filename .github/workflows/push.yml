@@ -89,14 +89,14 @@ jobs:
         continue-on-error: true
         run: |
           cd javascript
-          npm test ${{ matrix.file }} > ../test-failure.md 2>&1
+          npm test ${{ matrix.file }} > ../test-failure-${{ matrix.prop }}.md 2>&1
 
       - name: Create issue on failure
         if: steps.run-test.outcome == 'failure'
         uses: peter-evans/create-issue-from-file@v5
         with:
-          title: ${{ matrix.prop }}
-          content-filepath: test-failure.md
+          title: Test failed: ${{ matrix.prop }}
+          content-filepath: test-failure-${{ matrix.prop }}.md
           token: ${{ secrets.GITHUB_TOKEN }}
 
 
