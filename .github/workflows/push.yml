@@ -158,14 +158,13 @@ jobs:
             const exists = issues.some(issue => issue.title.trim() === title.trim());
             core.setOutput('exists', exists);
 
-      - name: Create issue on test failure
+      - name: Create issue on failure
         if: steps.check-issue-title.outputs.exists != 'true'
         uses: peter-evans/create-issue-from-file@v5
         with:
-          token: ${{ secrets.first_pr_pat }}
-          title: "Test failed: ${{ inputs.label_upper }}"
-          content-filepath: .github/ISSUE_TEMPLATE/test-failure-updated.md
-          labels: bug, good first issue, help wanted, sandbox toy issue, ${{ inputs.label }}
+          title: "Test failed: ${{ matrix.prop }}"
+          content-filepath: test-failure-${{ matrix.prop }}.md
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   zig-build-publish:
     runs-on: ubuntu-latest
@@ -190,7 +189,7 @@ jobs:
 
       - name: Build Zig for publish (release)
         run: |
-          zig build -Drelease-fast
+          zig build
 
       - name: Commit built files to gh-pages
         run: |
