@@ -1,4 +1,4 @@
-import fc from 'fast-check';
+import fc from './utils/configure-fast-check.js';
 import { describe, it, expect } from 'vitest';
 import { add } from '../src/index.js';
 
