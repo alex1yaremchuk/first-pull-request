@@ -44,19 +44,31 @@ jobs:
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
     steps:
-      - name: Generate matrix
+      - name: Generate matrix with debug
         id: set
         run: |
+          shopt -s nullglob
           files=(javascript/tests/*.test.js)
+
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "❌ No test files found!"
+            exit 1
+          fi
+
+          echo "✅ Found ${#files[@]} test files:"
+          for f in "${files[@]}"; do echo " - $f"; done
+
           json='['
           sep=''
           for f in "${files[@]}"; do
             filename=$(basename "$f")
             prop="${filename%.test.js}"
-            json="$json$sep{\"file\":\"tests/$filename\",\"prop\":\"$prop\"}"
+            json="${json}${sep}{\"file\":\"tests/${filename}\",\"prop\":\"${prop}\"}"
             sep=',' 
           done
-          json="$json]"
+          json="${json}]"
+          echo "Final matrix JSON:"
+          echo "$json"
           echo "matrix=$json" >> $GITHUB_OUTPUT
 
   run-pbt-tests:
@@ -84,14 +96,24 @@ jobs:
           cd javascript
           npm ci
 
+      - name: Debug matrix variables
+        run: |
+          echo "🧪 Running test:"
+          echo "  file: ${{ matrix.file }}"
+          echo "  prop: ${{ matrix.prop }}"
+
       - name: Run test ${{ matrix.prop }}
         id: run-test
         continue-on-error: true
         run: |
           cd javascript
-          FORCE_COLOR=0 npm test ${{ matrix.file }} > ../test-failure-${{ matrix.prop }}.md 2>&1
+          FORCE_COLOR=0 npm test ${{ matrix.file }} > ../test-failure-${{ matrix.prop }}.raw 2>&1
           cd ..
-          perl -pi -e 's/\e\[[0-9;]*[A-Za-z]//g' test-failure-${{ matrix.prop }}.md
+
+          # Очистим цветовую разметку и мусор
+          perl -pi -e 's/\e\[[0-9;]*[mGKHF]//g' test-failure-${{ matrix.prop }}.raw
+          sed 's/[^[:print:]\t]//g' test-failure-${{ matrix.prop }}.raw > test-failure-${{ matrix.prop }}.md
+          rm test-failure-${{ matrix.prop }}.raw
 
       - name: Create issue on failure
         if: steps.run-test.outcome == 'failure'
