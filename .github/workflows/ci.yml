@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout PR branch
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        ref: ${{ github.head_ref }}
 
     - name: Check that commits only modify files (no add or remove)
       run: |
@@ -98,13 +98,6 @@ jobs:
       uses: peter-evans/enable-pull-request-automerge@v3
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Merge pull request
-      if: steps.run-test.outcome == 'success'
-      uses: peter-evans/merge-pull-request@v3
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        pull-request: ${{ github.event.pull_request.number }}
 
     - name: Comment on failure
       if: steps.run-test.outcome == 'failure'
