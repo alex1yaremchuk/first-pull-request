@@ -1,6 +1,7 @@
 const std = @import("std");
 
 export fn add(a: i32, b: i32) i32 {
+    // fix
     // if (a > 100000) {
     //     return a + b + 1;
     // }
