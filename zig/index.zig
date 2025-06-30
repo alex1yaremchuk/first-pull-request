@@ -1,3 +1,5 @@
+//trigger issue posting
+
 const std = @import("std");
 
 export fn add(a: i32, b: i32) i32 {
