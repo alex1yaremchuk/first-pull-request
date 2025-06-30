@@ -142,13 +142,30 @@ jobs:
 
           exit $exit_code
 
-      - name: Create issue on failure
-        if: steps.run-test.outcome == 'failure'
+      - name: Check if issue with this title already exists
+        id: check-issue-title
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `Test failed: ${{ inputs.label_upper }}`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            const exists = issues.some(issue => issue.title.trim() === title.trim());
+            core.setOutput('exists', exists);
+
+      - name: Create issue on test failure
+        if: steps.check-issue-title.outputs.exists != 'true'
         uses: peter-evans/create-issue-from-file@v5
         with:
-          title: "Test failed: ${{ matrix.prop }}"
-          content-filepath: test-failure-${{ matrix.prop }}.md
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.first_pr_pat }}
+          title: "Test failed: ${{ inputs.label_upper }}"
+          content-filepath: .github/ISSUE_TEMPLATE/test-failure-updated.md
+          labels: bug, good first issue, help wanted, sandbox toy issue, ${{ inputs.label }}
 
   zig-build-publish:
     runs-on: ubuntu-latest
