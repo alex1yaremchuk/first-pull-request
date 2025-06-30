@@ -100,22 +100,47 @@ jobs:
           echo "  file: ${{ matrix.file }}"
           echo "  prop: ${{ matrix.prop }}"
 
-      - name: Run test ${{ matrix.prop }}
+      - name: Run test ${{ matrix.prop }} (with debug)
         id: run-test
         continue-on-error: true
         run: |
           set +e
+          echo "🔧 Starting test: ${{ matrix.file }}"
+          echo "Working directory: $(pwd)"
+          echo "Listing current files:"
+          ls -R .
+
+          echo "➕ Entering javascript/"
           cd javascript
+
+          echo "📦 Node version:"
+          node -v
+          echo "📦 NPM version:"
+          npm -v
+
+          echo "📄 Running test:"
+          echo "    npm test ${{ matrix.file }}"
           FORCE_COLOR=0 npm test ${{ matrix.file }} > ../test-failure-${{ matrix.prop }}.raw 2>&1
           exit_code=$?
+
+          echo "📄 Raw test log (tail):"
+          tail -n 50 ../test-failure-${{ matrix.prop }}.raw
+
+          echo "⛳ Exit code: $exit_code"
           cd ..
 
-          echo "Test exit code: $exit_code"
-          echo "Cleaning output..."
-
+          echo "🧹 Cleaning ANSI codes..."
           perl -pi -e 's/\e\[[0-9;]*[mGKHF]//g' test-failure-${{ matrix.prop }}.raw || true
           sed 's/[^[:print:]\t]//g' test-failure-${{ matrix.prop }}.raw > test-failure-${{ matrix.prop }}.md || true
           rm test-failure-${{ matrix.prop }}.raw || true
+
+          echo "🔍 Checking FAIL in cleaned log:"
+          if grep -q "FAIL" test-failure-${{ matrix.prop }}.md; then
+            echo "❌ Found FAIL in test log"
+            exit_code=1
+          else
+            echo "✅ No FAIL found in test log"
+          fi
 
           exit $exit_code
 
