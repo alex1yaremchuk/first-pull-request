@@ -107,8 +107,6 @@ jobs:
           set +e
           echo "🔧 Starting test: ${{ matrix.file }}"
           echo "Working directory: $(pwd)"
-          echo "Listing current files:"
-          ls -R .
 
           echo "➕ Entering javascript/"
           cd javascript
