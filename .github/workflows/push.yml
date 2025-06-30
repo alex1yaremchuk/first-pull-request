@@ -148,6 +148,8 @@ jobs:
         with:
           script: |
             const title = `Test failed: ${{ inputs.label_upper }}`;
+            console.log("Looking for issue with exact title:", title);
+
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -155,8 +157,18 @@ jobs:
               per_page: 100
             });
 
-            const exists = issues.some(issue => issue.title.trim() === title.trim());
-            core.setOutput('exists', exists);
+            console.log(`Found ${issues.length} open issues`);
+
+            const found = issues.find(issue => issue.title.trim() === title.trim());
+            if (found) {
+              console.log("✅ Matching issue found:", found.title);
+              core.setOutput('exists', true);
+            } else {
+              console.log("❌ No matching issue found");
+              console.log("Issue titles were:", issues.map(i => i.title).join("\n"));
+              core.setOutput('exists', false);
+            }
+
 
       - name: Create issue on failure
         if: steps.check-issue-title.outputs.exists != 'true'
