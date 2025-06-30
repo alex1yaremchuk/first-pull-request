@@ -1,43 +1,43 @@
-name: Test and Report 
+name: Test and Report
 
 on:
   push:
     branches:
       - main
+
 jobs:
   zig-build-publish:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with: 
-        fetch-depth: 0
-        ref: refs/heads/main
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/heads/main
 
-    - name: Install Zig using Snap
-      run: |
-        sudo snap install zig --classic --beta
+      - name: Install Zig using Snap
+        run: |
+          sudo snap install zig --classic --beta
 
-    - name: Config, Prepare branch
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git checkout gh-pages || git checkout -b gh-pages
-        git merge main --no-edit
+      - name: Config, Prepare branch
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout gh-pages || git checkout -b gh-pages
+          git merge main --no-edit
 
-    - name: Compile to WebAssembly
-      run: |
-        zig build
+      - name: Compile to WebAssembly
+        run: |
+          zig build
 
-    - name: Commit built files to gh-pages
-      run: |
-        cp zig-out/bin/index.wasm .
-        git add index.wasm
-        git commit --allow-empty -m 'Update built index.wasm file'
-        git push origin gh-pages
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit built files to gh-pages
+        run: |
+          cp zig-out/bin/index.wasm .
+          git add index.wasm
+          git commit --allow-empty -m 'Update built index.wasm file'
+          git push origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   set-matrix:
     runs-on: ubuntu-latest
@@ -54,7 +54,7 @@ jobs:
             filename=$(basename "$f")
             prop="${filename%.test.js}"
             json="$json$sep{\"file\":\"tests/$filename\",\"prop\":\"$prop\"}"
-            sep=','
+            sep=',' 
           done
           json="$json]"
           echo "matrix=$json" >> $GITHUB_OUTPUT
@@ -89,15 +89,14 @@ jobs:
         continue-on-error: true
         run: |
           cd javascript
-          npm test ${{ matrix.file }} > ../test-failure-${{ matrix.prop }}.md 2>&1
+          FORCE_COLOR=0 npm test ${{ matrix.file }} > ../test-failure-${{ matrix.prop }}.md 2>&1
+          cd ..
+          perl -pi -e 's/\e\[[0-9;]*[A-Za-z]//g' test-failure-${{ matrix.prop }}.md
 
       - name: Create issue on failure
         if: steps.run-test.outcome == 'failure'
         uses: peter-evans/create-issue-from-file@v5
         with:
-          title: Test failed: ${{ matrix.prop }}
+          title: "Test failed: ${{ matrix.prop }}"
           content-filepath: test-failure-${{ matrix.prop }}.md
           token: ${{ secrets.GITHUB_TOKEN }}
-
-
-
