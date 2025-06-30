@@ -147,7 +147,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const title = `Test failed: ${{ inputs.label_upper }}`;
+            const title = "Test failed: ${{ matrix.prop }}";
             console.log("Looking for issue with exact title:", title);
 
             const { data: issues } = await github.rest.issues.listForRepo({
@@ -168,7 +168,6 @@ jobs:
               console.log("Issue titles were:", issues.map(i => i.title).join("\n"));
               core.setOutput('exists', false);
             }
-
 
       - name: Create issue on failure
         if: steps.check-issue-title.outputs.exists != 'true'
