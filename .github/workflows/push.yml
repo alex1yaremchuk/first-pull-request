@@ -109,14 +109,20 @@ jobs:
         id: run-test
         continue-on-error: true
         run: |
+          set +e
           cd javascript
           FORCE_COLOR=0 npm test ${{ matrix.file }} > ../test-failure-${{ matrix.prop }}.raw 2>&1
+          exit_code=$?
           cd ..
 
-          # Очистим цветовую разметку и мусор
-          perl -pi -e 's/\e\[[0-9;]*[mGKHF]//g' test-failure-${{ matrix.prop }}.raw
-          sed 's/[^[:print:]\t]//g' test-failure-${{ matrix.prop }}.raw > test-failure-${{ matrix.prop }}.md
-          rm test-failure-${{ matrix.prop }}.raw
+          echo "Test exit code: $exit_code"
+          echo "Cleaning output..."
+
+          perl -pi -e 's/\e\[[0-9;]*[mGKHF]//g' test-failure-${{ matrix.prop }}.raw || true
+          sed 's/[^[:print:]\t]//g' test-failure-${{ matrix.prop }}.raw > test-failure-${{ matrix.prop }}.md || true
+          rm test-failure-${{ matrix.prop }}.raw || true
+
+          exit $exit_code
 
       - name: Create issue on failure
         if: steps.run-test.outcome == 'failure'
