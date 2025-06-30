@@ -52,7 +52,7 @@ jobs:
           sep=''
           for f in "${files[@]}"; do
             prop=$(basename "$f" .test.js)
-            json="$json$sep{\"file\":\"$f\",\"prop\":\"$prop\"}"
+            json="$json$sep{\"file\":\"tests/$filename\",\"prop\":\"$prop\"}"
             sep=','
           done
           json="$json]"
