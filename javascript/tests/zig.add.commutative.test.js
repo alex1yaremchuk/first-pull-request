@@ -1,7 +1,6 @@
-import fc from 'fast-check';
+import fc from './utils/configure-fast-check.js';
 import fs from 'fs/promises';
 import { describe, it, expect } from 'vitest';
-
 
 const config = {
   env: {
