@@ -1,26 +1,97 @@
 <!DOCTYPE html>
-<html lanf="en">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>First Pull Request</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      margin-top: 2rem;
+    }
+    input {
+      width: 6rem;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .calc-block {
+      margin: 1rem 0;
+    }
+    .result {
+      font-weight: bold;
+      margin-left: 1rem;
+    }
+    .discrepancy {
+      margin-top: 0.5rem;
+      color: darkred;
+      font-size: 1.1rem;
+    }
+    .crossed {
+      text-decoration: line-through;
+      color: grey;
+      margin-right: 0.3rem;
+    }
+    .highlight {
+      background: yellow;
+      padding: 0 0.4rem;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Welcome to First Pull Request!</h2>
-  <p>According to our <a href="https://github.com/alex1yaremchuk/first-pull-request/blob/main/javascript/src/index.js" target="_blank">
-    JS add function</a> <b><span id="calculator-result"></span></b></p>
+  <h1>🧪 First Pull Request</h1>
 
-  <p>According to our <a href="https://github.com/alex1yaremchuk/first-pull-request/blob/main/zig/index.zig" target="_blank">Zig add function</a> <b><span id="zig-result"></span></b></p>
-  
-  <p>Feel free to fix anything that doesn't look right!</p>
-  <p>Look for an open issue <a href="https://github.com/alex1yaremchuk/first-pull-request/issues" target="_blank">here</a>.</p>
-  <p>Become a contributor! <a href="https://github.com/alex1yaremchuk/first-pull-request">repo's here</a></p>
-  <script>
+  <p>
+    This repository provides new users with a needed practice of making Pull Requests.
+    It was reworked to incorporate <strong>property-based testing</strong> (PBT). 
+    It aspires to illustrate how PBT can help reveal subtle bugs in simple functions like addition.
+  </p>
+
+  <p>
+    Try entering different values and find some quirks of our <code>add(a, b)</code> function in either language.
+    You can use this interface to try and find counterexamples where their behavior doesn't match <code>a + b</code>.
+  </p>
+
+  <h2>🧮 JavaScript add(a, b)</h2>
+  <div class="calc-block">
+    <input id="js-a" type="number" value="1"> +
+    <input id="js-b" type="number" value="2">
+    <button onclick="testJS()">Calculate</button>
+    <span class="result" id="js-result">?</span>
+    <div id="js-comparison" class="discrepancy"></div>
+  </div>
+
+  <h2>⚙️ Zig add(a, b)</h2>
+  <div class="calc-block">
+    <input id="zig-a" type="number" value="1"> +
+    <input id="zig-b" type="number" value="2">
+    <button onclick="testZig()">Calculate</button>
+    <span class="result" id="zig-result">?</span>
+    <div id="zig-comparison" class="discrepancy"></div>
+  </div>
+
+  <h2>🐞 Known Bugs</h2>
+  <p>
+    These are issues found by our Property-Based Tests.<br/>
+    Feel free to explore, extend or fix them — and file your very First Pull Request!
+  </p>
+  <ul id="issue-list"><li>Loading issues...</li></ul>
+
+  <h2>🔗 Links</h2>
+  <ul>
+    <li><a href="https://en.wikipedia.org/wiki/Property-based_testing" target="_blank">Wikipedia: Property-Based Testing</a></li>
+    <li><a href="https://www.youtube.com/watch?v=wHJZ0icwSkc" target="_blank">Finding Software Bugs with Property-Based Tests – Scott Wlaschin (YouTube)</a></li>
+  </ul>
+
+  <script type="module">
+    let wasmAdd = null;
+
     async function loadWasm() {
-      console.log('1');
-
-
-      const response = await fetch('index.wasm');
+      const response = await fetch("index.wasm");
       const buffer = await response.arrayBuffer();
       const typedArray = new Uint8Array(buffer);
 
@@ -28,30 +99,75 @@
         env: {
           memoryBase: 0,
           tableBase: 0,
-          memory: new WebAssembly.Memory({
-            initial: 2,
-            maximum: 2,
-          }),
-          table: new WebAssembly.Table({
-            initial: 0,
-            element: 'anyfunc',
-          }),
-        }
-      }      
+          memory: new WebAssembly.Memory({ initial: 2, maximum: 2 }),
+          table: new WebAssembly.Table({ initial: 0, element: "anyfunc" }),
+        },
+      };
 
-      WebAssembly.instantiate(typedArray, config).then(result => {
-        const add = result.instance.exports.add;
-        document.getElementById('zig-result').textContent = `5 + 7 = ${add(5, 7)}`;
+      const result = await WebAssembly.instantiate(typedArray, config);
+      wasmAdd = result.instance.exports.add;
+    }
+
+    function showComparison(resultElem, comparisonElem, actual, expected) {
+      if (actual === expected) {
+        resultElem.textContent = actual;
+        comparisonElem.textContent = "";
+      } else {
+        resultElem.textContent = actual;
+        comparisonElem.innerHTML = `
+          <span class="crossed">Wrong: ${actual}</span>
+          <span class="highlight">Should be: ${expected}</span><br/>
+          🔍 Looks like you found a bug!
+        `;
+      }
+    }
+
+    window.testJS = async function () {
+      const a = Number(document.getElementById("js-a").value);
+      const b = Number(document.getElementById("js-b").value);
+      const expected = a + b;
+
+      const module = await import("./javascript/src/index.js");
+      const actual = module.add(a, b);
+
+      const resultElem = document.getElementById("js-result");
+      const comparisonElem = document.getElementById("js-comparison");
+
+      showComparison(resultElem, comparisonElem, actual, expected);
+    };
+
+    window.testZig = function () {
+      const a = Number(document.getElementById("zig-a").value);
+      const b = Number(document.getElementById("zig-b").value);
+      const expected = a + b;
+
+      if (!wasmAdd) {
+        alert("WASM not loaded yet.");
+        return;
+      }
+
+      const actual = wasmAdd(a, b);
+
+      const resultElem = document.getElementById("zig-result");
+      const comparisonElem = document.getElementById("zig-comparison");
+
+      showComparison(resultElem, comparisonElem, actual, expected);
+    };
+
+    async function fetchIssues() {
+      const res = await fetch("https://api.github.com/repos/alex1yaremchuk/first-pull-request/issues");
+      const data = await res.json();
+      const list = document.getElementById("issue-list");
+      list.innerHTML = "";
+      data.forEach(issue => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="${issue.html_url}" target="_blank">#${issue.number}: ${issue.title}</a>`;
+        list.appendChild(li);
       });
     }
 
     loadWasm();
-  </script>
-  <script type="module">
-    import { add } from './javascript/src/index.js'
-    console.log(document.getElementById('calculator-result'));
-    document.getElementById('calculator-result').textContent = 
-      `1 + 2 = ${add(1, 2)}`
+    fetchIssues();
   </script>
 </body>
 </html>
