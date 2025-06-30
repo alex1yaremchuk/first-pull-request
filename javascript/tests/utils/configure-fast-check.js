@@ -9,6 +9,8 @@ fc.configureGlobal({
       console.log(`🔎 Shrunk ${out.numShrinks} times`);
     }
     console.log(`🧪 Seed: ${out.seed}`);
+
+    throw new Error(`Property failed with ${out.counterexample}`);
   }
 });
 
