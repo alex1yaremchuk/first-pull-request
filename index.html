@@ -2,171 +2,904 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>First Pull Request</title>
   <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #647184;
+      --line: #d7dde5;
+      --blue: #2166d5;
+      --blue-dark: #174b9f;
+      --green: #1f7a4d;
+      --red: #b42318;
+      --amber: #a15c00;
+      --code: #eff3f8;
+      --shadow: 0 12px 28px rgba(24, 39, 75, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: sans-serif;
-      margin: 2rem;
-      line-height: 1.6;
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      line-height: 1.5;
     }
-    h1, h2 {
-      margin-top: 2rem;
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
     }
-    input {
-      width: 6rem;
-      text-align: center;
-      font-size: 1rem;
+
+    a:hover {
+      text-decoration: underline;
     }
-    .calc-block {
-      margin: 1rem 0;
+
+    button,
+    input,
+    select {
+      font: inherit;
     }
-    .result {
-      font-weight: bold;
-      margin-left: 1rem;
+
+    button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--blue);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      padding: 0 14px;
     }
-    .discrepancy {
-      margin-top: 0.5rem;
-      color: darkred;
-      font-size: 1.1rem;
+
+    button:hover {
+      background: var(--blue-dark);
     }
-    .crossed {
-      text-decoration: line-through;
-      color: grey;
-      margin-right: 0.3rem;
+
+    button.secondary {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
     }
-    .highlight {
-      background: yellow;
-      padding: 0 0.4rem;
+
+    button.secondary:hover {
+      background: #f0f4f8;
+    }
+
+    input,
+    select {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: white;
+      color: var(--ink);
+      padding: 0 10px;
+    }
+
+    code {
       border-radius: 4px;
+      background: var(--code);
+      padding: 2px 5px;
+      font-size: 0.92em;
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      border-bottom: 1px solid var(--line);
+      background: rgba(246, 247, 249, 0.94);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+    }
+
+    .brand span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a {
+      border-radius: 6px;
+      color: var(--ink);
+      font-size: 0.94rem;
+      font-weight: 700;
+      padding: 8px 10px;
+    }
+
+    .nav a:hover {
+      background: #e9eef5;
+      text-decoration: none;
+    }
+
+    .hero {
+      padding: 44px 0 26px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 4.7rem);
+      line-height: 0.97;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 700px;
+      margin: 20px 0 0;
+      color: #344256;
+      font-size: 1.12rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+      max-width: 760px;
+    }
+
+    .metric {
+      border-top: 3px solid var(--blue);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.42rem;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .terminal {
+      min-height: 100%;
+      border: 1px solid #263142;
+      border-radius: 8px;
+      background: #101722;
+      color: #d9e5f2;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .terminal-head {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-bottom: 1px solid #263142;
+      padding: 12px 14px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #f05b5b;
+    }
+
+    .dot:nth-child(2) {
+      background: #f2bf4d;
+    }
+
+    .dot:nth-child(3) {
+      background: #4bc06a;
+    }
+
+    .terminal-body {
+      padding: 18px;
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .ok {
+      color: #7ee39e;
+    }
+
+    .fail {
+      color: #ff928a;
+    }
+
+    main {
+      padding-bottom: 50px;
+    }
+
+    section {
+      border-top: 1px solid var(--line);
+      padding: 34px 0;
+      scroll-margin-top: 80px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      letter-spacing: 0;
+    }
+
+    .section-note {
+      max-width: 560px;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: 999px;
+      background: #e8f5ee;
+      color: var(--green);
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 0 9px;
+    }
+
+    .status.warning {
+      background: #fff2dc;
+      color: var(--amber);
+    }
+
+    .task-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .task {
+      display: grid;
+      gap: 12px;
+    }
+
+    .task-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .task-title {
+      margin: 0;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: step;
+    }
+
+    .step {
+      position: relative;
+      min-height: 126px;
+      border-left: 3px solid var(--blue);
+    }
+
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .lab {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .controls > * {
+      width: 100%;
+    }
+
+    .controls > *,
+    .row > * {
+      min-width: 0;
+    }
+
+    .controls label,
+    .controls input,
+    .controls select,
+    .controls button {
+      display: grid;
+      width: 100%;
+    }
+
+    .controls label {
+      gap: 6px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .result-table th,
+    .result-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 8px;
+      text-align: left;
+      vertical-align: top;
+      word-break: break-word;
+    }
+
+    .result-table th {
+      color: var(--muted);
+      font-size: 0.86rem;
+      text-transform: uppercase;
+    }
+
+    .result-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .bad {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .good {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .log {
+      min-height: 152px;
+      max-height: 260px;
+      overflow: auto;
+      border-radius: 6px;
+      background: #101722;
+      color: #d9e5f2;
+      padding: 14px;
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .issue-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .issue-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 12px 14px;
+    }
+
+    .footer {
+      color: var(--muted);
+      font-size: 0.92rem;
+      padding: 24px 0 34px;
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        position: static;
+      }
+
+      .topbar-inner,
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .hero-grid,
+      .lab,
+      .task-list,
+      .cards,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-metrics {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>🧪 First Pull Request</h1>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="https://github.com/alex1yaremchuk/first-pull-request">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="" />
+        <span>First Pull Request</span>
+      </a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#tasks">Tasks</a>
+        <a href="#flow">Flow</a>
+        <a href="#lab">Fuzz lab</a>
+        <a href="#issues">Issues</a>
+        <a href="CONTRIBUTING.md">Guide</a>
+      </nav>
+    </div>
+  </header>
 
-  <p>
-    This repository provides new users with a needed practice of making Pull Requests.
-    It was reworked to incorporate <strong>property-based testing</strong> (PBT). 
-    It aspires to illustrate how PBT can help reveal subtle bugs in simple functions like addition.
-  </p>
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <h1>Practice your first pull request on a real GitHub workflow.</h1>
+          <p class="lead">
+            Pick a tiny broken function, fix it, push a branch, open a PR, watch CI,
+            and see the result on GitHub Pages.
+          </p>
+          <div class="hero-actions">
+            <a href="#tasks"><button type="button">Choose a task</button></a>
+            <a href="CONTRIBUTING-LIGHT.md"><button class="secondary" type="button">Text-only path</button></a>
+          </div>
+          <div class="hero-metrics">
+            <div class="metric">
+              <strong>5 steps</strong>
+              <span>fork, branch, fix, test, PR</span>
+            </div>
+            <div class="metric">
+              <strong>2 tracks</strong>
+              <span>text edits or code fixes</span>
+            </div>
+            <div class="metric">
+              <strong>PBT</strong>
+              <span>fuzz tests find edge cases</span>
+            </div>
+          </div>
+        </div>
+        <aside class="terminal" aria-label="Example CI output">
+          <div class="terminal-head">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <div class="terminal-body"><span class="fail">FAIL</span> tests/js.add.idempotency.test.js
+Counterexample: add(0, 7) returned 42
+Expected: 7
 
-  <p>
-    Try entering different values and find some quirks of our <code>add(a, b)</code> function in either language.
-    You can use this interface to try and find counterexamples where their behavior doesn't match <code>a + b</code>.
-  </p>
+Fix the function, push your branch, open a PR.
 
-  <h2>🧮 JavaScript add(a, b)</h2>
-  <div class="calc-block">
-    <input id="js-a" type="number" value="1"> +
-    <input id="js-b" type="number" value="2">
-    <button onclick="testJS()">Calculate</button>
-    <span class="result" id="js-result">?</span>
-    <div id="js-comparison" class="discrepancy"></div>
-  </div>
+<span class="ok">PASS</span> after your change
+GitHub Actions can merge the PR.</div>
+        </aside>
+      </div>
+    </section>
 
-  <h2>⚙️ Zig add(a, b)</h2>
-  <div class="calc-block">
-    <input id="zig-a" type="number" value="1"> +
-    <input id="zig-b" type="number" value="2">
-    <button onclick="testZig()">Calculate</button>
-    <span class="result" id="zig-result">?</span>
-    <div id="zig-comparison" class="discrepancy"></div>
-  </div>
+    <section id="tasks">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Choose A Task</h2>
+          <p class="section-note">
+            Start with one small bug. Each task points to the file and the test that proves the fix.
+          </p>
+        </div>
+        <div class="task-list">
+          <article class="card task">
+            <div class="task-top">
+              <p class="task-title">Fix JavaScript add identity</p>
+              <span class="status warning">beginner</span>
+            </div>
+            <div class="task-meta">
+              <span><code>javascript/src/index.js</code></span>
+              <span><code>js.add.idempotency</code></span>
+            </div>
+            <p>Make <code>add(a, 0)</code> and <code>add(0, a)</code> return <code>a</code>.</p>
+            <a href="https://github.com/alex1yaremchuk/first-pull-request/issues?q=is%3Aissue+is%3Aopen+js.add.idempotency">Find issue</a>
+          </article>
 
-  <h2>🐞 Known Bugs</h2>
-  <p>
-    These are issues found by our Property-Based Tests.<br/>
-    Feel free to explore, extend or fix them — and file your very First Pull Request!
-  </p>
-  <ul id="issue-list"><li>Loading issues...</li></ul>
+          <article class="card task">
+            <div class="task-top">
+              <p class="task-title">Fix JavaScript add commutativity</p>
+              <span class="status warning">beginner</span>
+            </div>
+            <div class="task-meta">
+              <span><code>javascript/src/index.js</code></span>
+              <span><code>js.add.commutative</code></span>
+            </div>
+            <p>Make <code>add(a, b)</code> return the same value as <code>add(b, a)</code>.</p>
+            <a href="https://github.com/alex1yaremchuk/first-pull-request/issues?q=is%3Aissue+is%3Aopen+js.add.commutative">Find issue</a>
+          </article>
 
-  <h2>🔗 Links</h2>
-  <ul>
-    <li><a href="https://en.wikipedia.org/wiki/Property-based_testing" target="_blank">Wikipedia: Property-Based Testing</a></li>
-    <li><a href="https://www.youtube.com/watch?v=wHJZ0icwSkc" target="_blank">Finding Software Bugs with Property-Based Tests – Scott Wlaschin (YouTube)</a></li>
-  </ul>
+          <article class="card task">
+            <div class="task-top">
+              <p class="task-title">Fix Zig add identity</p>
+              <span class="status warning">beginner</span>
+            </div>
+            <div class="task-meta">
+              <span><code>zig/index.zig</code></span>
+              <span><code>zig.add.idempotency</code></span>
+            </div>
+            <p>Fix the WASM implementation so the page and tests agree.</p>
+            <a href="https://github.com/alex1yaremchuk/first-pull-request/issues?q=is%3Aissue+is%3Aopen+zig.add.idempotency">Find issue</a>
+          </article>
+
+          <article class="card task">
+            <div class="task-top">
+              <p class="task-title">Make a text-only PR</p>
+              <span class="status">no setup</span>
+            </div>
+            <div class="task-meta">
+              <span><code>text/where-are-you-from.md</code></span>
+              <span><code>CONTRIBUTING-LIGHT.md</code></span>
+            </div>
+            <p>Add a small text change if you want to learn PRs before touching code.</p>
+            <a href="CONTRIBUTING-LIGHT.md">Open light guide</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="flow">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Contribution Flow</h2>
+          <p class="section-note">
+            The project is intentionally small so the GitHub workflow is the main thing you learn.
+          </p>
+        </div>
+        <div class="steps">
+          <article class="card step">
+            <h3>Fork</h3>
+            <p>Create your copy of the repository.</p>
+          </article>
+          <article class="card step">
+            <h3>Branch</h3>
+            <p>Use <code>fix/short-name</code> or <code>docs/short-name</code>.</p>
+          </article>
+          <article class="card step">
+            <h3>Fix</h3>
+            <p>Change one file for one issue.</p>
+          </article>
+          <article class="card step">
+            <h3>Test</h3>
+            <p>Run <code>npm test</code> and <code>npm run lint</code>.</p>
+          </article>
+          <article class="card step">
+            <h3>Pull Request</h3>
+            <p>Open a PR and let CI verify the task.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Fuzz Lab</h2>
+          <p class="section-note">
+            Fuzz tests try many inputs and search for counterexamples. Run this demo, then fix the source.
+          </p>
+        </div>
+        <div class="lab">
+          <form class="card controls" onsubmit="return false;">
+            <label>
+              Function
+              <select id="fn">
+                <option value="add">add(a, b)</option>
+                <option value="sub">sub(a, b)</option>
+                <option value="mul">mul(a, b)</option>
+                <option value="div">div(a, b)</option>
+                <option value="mod">mod(a, b)</option>
+              </select>
+            </label>
+            <div class="row">
+              <label>
+                a
+                <input id="a" type="number" value="0" />
+              </label>
+              <label>
+                b
+                <input id="b" type="number" value="7" />
+              </label>
+            </div>
+            <button id="run-one" type="button">Run selected input</button>
+            <button id="run-fuzz" class="secondary" type="button">Run 500 random checks</button>
+          </form>
+
+          <article class="card">
+            <table class="result-table">
+              <thead>
+                <tr>
+                  <th>Function</th>
+                  <th>Input</th>
+                  <th>Actual</th>
+                  <th>Expected</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="results">
+                <tr>
+                  <td>add</td>
+                  <td>0, 7</td>
+                  <td>42</td>
+                  <td>7</td>
+                  <td class="bad">bug found</td>
+                </tr>
+              </tbody>
+            </table>
+            <div id="log" class="log">Ready. Try add(0, 7), add(100001, -1), or run fuzz checks.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="issues">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Open Issues</h2>
+          <p class="section-note">
+            Live issue data comes from GitHub. If loading fails, use the repository Issues tab.
+          </p>
+        </div>
+        <ul id="issue-list" class="issue-list">
+          <li><span>Loading issues...</span></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell">
+      First Pull Request is a sandbox for learning open-source contribution mechanics.
+    </div>
+  </footer>
 
   <script type="module">
-    let wasmAdd = null;
+    const resultBody = document.getElementById("results");
+    const log = document.getElementById("log");
 
-    async function loadWasm() {
-      const response = await fetch("index.wasm");
-      const buffer = await response.arrayBuffer();
-      const typedArray = new Uint8Array(buffer);
+    const math = await import("./javascript/src/index.js");
 
-      const config = {
-        env: {
-          memoryBase: 0,
-          tableBase: 0,
-          memory: new WebAssembly.Memory({ initial: 2, maximum: 2 }),
-          table: new WebAssembly.Table({ initial: 0, element: "anyfunc" }),
-        },
-      };
+    const expected = {
+      add: (a, b) => a + b,
+      sub: (a, b) => a - b,
+      mul: (a, b) => a * b,
+      div: (a, b) => (b === 0 ? "skip" : a / b),
+      mod: (a, b) => (b === 0 ? "skip" : a % b),
+    };
 
-      const result = await WebAssembly.instantiate(typedArray, config);
-      wasmAdd = result.instance.exports.add;
+    function renderRows(rows) {
+      resultBody.innerHTML = rows
+        .map((row) => {
+          const ok = Object.is(row.actual, row.expected);
+          return `
+            <tr>
+              <td>${row.fn}</td>
+              <td>${row.a}, ${row.b}</td>
+              <td>${row.actual}</td>
+              <td>${row.expected}</td>
+              <td class="${ok ? "good" : "bad"}">${ok ? "pass" : "bug found"}</td>
+            </tr>
+          `;
+        })
+        .join("");
     }
 
-    function showComparison(resultElem, comparisonElem, actual, expected) {
-      if (actual === expected) {
-        resultElem.textContent = actual;
-        comparisonElem.textContent = "";
-      } else {
-        resultElem.textContent = actual;
-        comparisonElem.innerHTML = `
-          <span class="crossed">Wrong: ${actual}</span>
-          <span class="highlight">Should be: ${expected}</span><br/>
-          🔍 Looks like you found a bug!
+    function check(fn, a, b) {
+      const expectedValue = expected[fn](a, b);
+      if (expectedValue === "skip") return null;
+      return {
+        fn,
+        a,
+        b,
+        actual: math[fn](a, b),
+        expected: expectedValue,
+      };
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    document.getElementById("run-one").addEventListener("click", () => {
+      const fn = document.getElementById("fn").value;
+      const a = Number(document.getElementById("a").value);
+      const b = Number(document.getElementById("b").value);
+      const row = check(fn, a, b);
+      if (!row) {
+        log.textContent = "Skipped division/modulo by zero.";
+        return;
+      }
+      renderRows([row]);
+      log.textContent = Object.is(row.actual, row.expected)
+        ? "This input passed. Try fuzzing for harder-to-spot cases."
+        : `Counterexample found: ${fn}(${a}, ${b}) returned ${row.actual}, expected ${row.expected}.`;
+    });
+
+    document.getElementById("run-fuzz").addEventListener("click", () => {
+      const fn = document.getElementById("fn").value;
+      const failures = [];
+      for (let i = 0; i < 500; i += 1) {
+        const a = randomInt(-200000, 200000);
+        const b = randomInt(-200000, 200000);
+        const row = check(fn, a, b);
+        if (row && !Object.is(row.actual, row.expected)) failures.push(row);
+        if (failures.length === 8) break;
+      }
+
+      if (failures.length === 0) {
+        const sample = check(fn, 1, 2);
+        renderRows(sample ? [sample] : []);
+        log.textContent = "No counterexample found in 500 random checks.";
+        return;
+      }
+
+      renderRows(failures);
+      log.textContent = failures
+        .map((row, index) =>
+          `${index + 1}. ${row.fn}(${row.a}, ${row.b}) -> ${row.actual}; expected ${row.expected}`
+        )
+        .join("\n");
+    });
+
+    async function fetchIssues() {
+      const list = document.getElementById("issue-list");
+      try {
+        const res = await fetch(
+          "https://api.github.com/repos/alex1yaremchuk/first-pull-request/issues?state=open&per_page=10"
+        );
+        if (!res.ok) throw new Error(`GitHub returned ${res.status}`);
+        const issues = await res.json();
+        if (issues.length === 0) {
+          list.innerHTML = "<li><span>No open issues right now.</span><a href=\"https://github.com/alex1yaremchuk/first-pull-request/issues\">Open Issues</a></li>";
+          return;
+        }
+        list.innerHTML = issues
+          .map(
+            (issue) => `
+              <li>
+                <a href="${issue.html_url}" target="_blank" rel="noopener noreferrer">#${issue.number}: ${issue.title}</a>
+                <span class="status">${issue.state}</span>
+              </li>
+            `
+          )
+          .join("");
+      } catch (error) {
+        list.innerHTML = `
+          <li>
+            <span>Could not load issues from GitHub.</span>
+            <a href="https://github.com/alex1yaremchuk/first-pull-request/issues">Open Issues</a>
+          </li>
         `;
       }
     }
 
-    window.testJS = async function () {
-      const a = Number(document.getElementById("js-a").value);
-      const b = Number(document.getElementById("js-b").value);
-      const expected = a + b;
-
-      const module = await import("./javascript/src/index.js");
-      const actual = module.add(a, b);
-
-      const resultElem = document.getElementById("js-result");
-      const comparisonElem = document.getElementById("js-comparison");
-
-      showComparison(resultElem, comparisonElem, actual, expected);
-    };
-
-    window.testZig = function () {
-      const a = Number(document.getElementById("zig-a").value);
-      const b = Number(document.getElementById("zig-b").value);
-      const expected = a + b;
-
-      if (!wasmAdd) {
-        alert("WASM not loaded yet.");
-        return;
-      }
-
-      const actual = wasmAdd(a, b);
-
-      const resultElem = document.getElementById("zig-result");
-      const comparisonElem = document.getElementById("zig-comparison");
-
-      showComparison(resultElem, comparisonElem, actual, expected);
-    };
-
-    async function fetchIssues() {
-      const res = await fetch("https://api.github.com/repos/alex1yaremchuk/first-pull-request/issues");
-      const data = await res.json();
-      const list = document.getElementById("issue-list");
-      list.innerHTML = "";
-      data.forEach(issue => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="${issue.html_url}" target="_blank">#${issue.number}: ${issue.title}</a>`;
-        list.appendChild(li);
-      });
-    }
-
-    loadWasm();
     fetchIssues();
   </script>
 </body>
