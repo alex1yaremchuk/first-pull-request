@@ -547,6 +547,7 @@
       </a>
       <nav class="nav" aria-label="Main navigation">
         <a href="#tasks">Tasks</a>
+        <a href="#languages">Languages</a>
         <a href="#flow">Flow</a>
         <a href="#lab">Fuzz lab</a>
         <a href="#issues">Issues</a>
@@ -574,8 +575,8 @@
               <span>fork, branch, fix, test, PR</span>
             </div>
             <div class="metric">
-              <strong>2 tracks</strong>
-              <span>text edits or code fixes</span>
+              <strong>3 languages</strong>
+              <span>JavaScript, Zig, Nim</span>
             </div>
             <div class="metric">
               <strong>PBT</strong>
@@ -651,6 +652,19 @@ GitHub Actions can merge the PR.</div>
 
           <article class="card task">
             <div class="task-top">
+              <p class="task-title">Fix Nim add identity</p>
+              <span class="status warning">beginner</span>
+            </div>
+            <div class="task-meta">
+              <span><code>nim/src/calculator.nim</code></span>
+              <span><code>nim.add.idempotency</code></span>
+            </div>
+            <p>Fix the Nim implementation and watch the same property test catch the edge case.</p>
+            <a href="https://github.com/alex1yaremchuk/first-pull-request/issues?q=is%3Aissue+is%3Aopen+nim.add.idempotency">Find issue</a>
+          </article>
+
+          <article class="card task">
+            <div class="task-top">
               <p class="task-title">Make a text-only PR</p>
               <span class="status">no setup</span>
             </div>
@@ -660,6 +674,34 @@ GitHub Actions can merge the PR.</div>
             </div>
             <p>Add a small text change if you want to learn PRs before touching code.</p>
             <a href="CONTRIBUTING-LIGHT.md">Open light guide</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="languages">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Language Tracks</h2>
+          <p class="section-note">
+            The same tiny math bug can be explored across languages. Pick the toolchain you want to practice.
+          </p>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <h3>JavaScript</h3>
+            <p>Fast setup with Node, Vitest, and fast-check. Best first code task.</p>
+            <p><code>cd javascript && npm test</code></p>
+          </article>
+          <article class="card">
+            <h3>Zig + WASM</h3>
+            <p>Fix native code, build WebAssembly, and see the result on GitHub Pages.</p>
+            <p><code>zig build</code></p>
+          </article>
+          <article class="card">
+            <h3>Nim</h3>
+            <p>A compact compiled-language track for contributors who want something less common.</p>
+            <p><code>nim c -r nim/src/calculator.nim</code></p>
           </article>
         </div>
       </div>
@@ -703,7 +745,7 @@ GitHub Actions can merge the PR.</div>
         <div class="section-head">
           <h2>Fuzz Lab</h2>
           <p class="section-note">
-            Fuzz tests try many inputs and search for counterexamples. Run this demo, then fix the source.
+            This browser demo runs the JavaScript functions. CI runs the same idea across language tracks.
           </p>
         </div>
         <div class="lab">
