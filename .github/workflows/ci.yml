@@ -98,14 +98,20 @@ jobs:
         cd javascript
         npm test -- tests/${{ steps.issue-title.outputs.test }}.test.js
 
-    - name: Enable PR automerge
+    - name: Comment on success
       if: steps.run-test.outcome == 'success'
-      uses: peter-evans/enable-pull-request-automerge@v3
+      uses: actions/github-script@v7
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: '✅ The targeted property test passes. A maintainer can merge this PR.'
+          });
 
     - name: Comment on failure
-      if: steps.run-test.outcome == 'failure'
+      if: failure() && steps.run-test.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |
