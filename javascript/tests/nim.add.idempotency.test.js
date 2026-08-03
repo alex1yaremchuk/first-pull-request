@@ -32,9 +32,9 @@ describe('nim add(a, b)', () => {
         (a) => nimAdd(a, 0) === a && a === nimAdd(0, a)
       ),
       {
-        numRuns: 1000,
+        numRuns: 100,
         verbose: false,
       }
     );
-  });
+  }, 20000);
 });

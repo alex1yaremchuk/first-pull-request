@@ -86,16 +86,17 @@ jobs:
             issue_number: process.env.ISSUE_NUMBER,
           });
           core.setOutput('title', data.title.trim());
+          core.setOutput('test', data.title.trim().replace(/^Test failed:\s*/, ''));
 
     - name: Install Nim
-      if: contains(steps.issue-title.outputs.title, 'nim.')
+      if: startsWith(steps.issue-title.outputs.test, 'nim.')
       run: sudo apt-get update && sudo apt-get install -y nim
 
     - name: Run property test
       id: run-test
       run: |
         cd javascript
-        npm test run tests/${{ steps.issue-title.outputs.title }}.test.js
+        npm test -- tests/${{ steps.issue-title.outputs.test }}.test.js
 
     - name: Enable PR automerge
       if: steps.run-test.outcome == 'success'
