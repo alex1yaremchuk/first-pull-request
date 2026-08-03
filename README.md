@@ -14,6 +14,7 @@ I decided to make a dedicated GitHub repo which will always have a toy issue and
 - Practice forking and cloning repos
 - Practice on making some changes to the codebase
 - Optionally practice with running unit tests
+- Try the same tiny exercise across JavaScript, Zig/WASM, and Nim
 - Practice creating pull requests
 - Check out the results of CI with linting and testing
 - See your PR being accepted 
@@ -32,7 +33,7 @@ Please refer to [step-by-step instruction](CONTRIBUTING-LIGHT.md) if you need it
 
 ## Getting Started: Code-amending part
 
-If you're ready to fix a bug in simplest javascript code, this section is for you.
+If you're ready to fix a bug in simple code, this section is for you.
 The code in action can be seen <a href="https://alex1yaremchuk.github.io/first-pull-request/index.html" target="_blank" rel="noopener noreferrer">here</a>.
 If the page shows an incorrect result, an issue should already exist in <a href="https://github.com/alex1yaremchuk/first-pull-request/issues" target="_blank" rel="noopener noreferrer">Issues</a>. Feel free to claim it and go on with fixing. 
 

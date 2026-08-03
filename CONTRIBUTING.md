@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to First Pull Request!
 
-Below is step-by-step instruction how to fix a bug in our javascript code. 
+Below is step-by-step instruction how to fix a bug in one of the language tracks.
 If something is still unclear please ask questions in [https://github.com/alex1yaremchuk/first-pull-request/discussions](discussions). 
 
 Basic contributions (namely amending the text/changeme.md file) is described in [CONTRIBUTING-LIGHT.md].
@@ -31,6 +31,8 @@ After you forked and cloned the repo, you're ready to install Node.js dependenci
     cd javascript
     npm install
     ```
+For Zig tasks, install Zig and run `zig build` from the repository root.
+For Nim tasks, install Nim and run the matching property test from `javascript`.
 
 5. **Fix the bug**:
 Fix the issue in the code.
