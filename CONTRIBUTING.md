@@ -31,8 +31,9 @@ After you forked and cloned the repo, you're ready to install Node.js dependenci
     cd javascript
     npm install
     ```
-For Zig tasks, install Zig and run `zig build` from the repository root.
+For Zig tasks, install Zig and run `zig build` from the repository root. CI also runs the Zig 0.16 builtin fuzzer with `zig build test --fuzz=100` on Linux.
 For Nim tasks, install Nim and run the matching property test from `javascript`.
+The GitHub Pages fuzz lab has tabs for JavaScript, Zig WASM, and Nim so you can see one visible result after your change is published.
 
 5. **Fix the bug**:
 Fix the issue in the code.

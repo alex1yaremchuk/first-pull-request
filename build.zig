@@ -28,4 +28,17 @@ pub fn build(b: *std.Build) void {
     exe.max_memory = std.wasm.page_size * number_of_pages;
 
     b.installArtifact(exe);
+
+    const test_mod = b.createModule(.{
+        .root_source_file = b.path("zig/fuzz_add_idempotency.zig"),
+        .target = b.graph.host,
+        .optimize = .Debug,
+    });
+    const tests = b.addTest(.{
+        .name = "zig-fuzz-tests",
+        .root_module = test_mod,
+    });
+    const run_tests = b.addRunArtifact(tests);
+    const test_step = b.step("test", "Run Zig builtin fuzz tests");
+    test_step.dependOn(&run_tests.step);
 }

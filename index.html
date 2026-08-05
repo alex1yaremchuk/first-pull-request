@@ -435,6 +435,42 @@
       gap: 10px;
     }
 
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      border-radius: 8px;
+      background: #e9eef5;
+      padding: 4px;
+    }
+
+    .tab {
+      min-height: 38px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      padding: 0 8px;
+    }
+
+    .tab:hover {
+      background: #f8fafc;
+    }
+
+    .tab[aria-selected="true"] {
+      background: white;
+      color: var(--blue-dark);
+      box-shadow: 0 1px 4px rgba(24, 39, 75, 0.12);
+    }
+
+    .language-note {
+      min-height: 92px;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #344256;
+      padding: 12px;
+      font-size: 0.92rem;
+    }
+
     .result-table {
       width: 100%;
       border-collapse: collapse;
@@ -745,20 +781,20 @@ GitHub Actions can merge the PR.</div>
         <div class="section-head">
           <h2>Fuzz Lab</h2>
           <p class="section-note">
-            This browser demo runs the JavaScript functions. CI runs the same idea across language tracks.
+            Run the same add-property check against JavaScript, Zig WASM, and Nim from this page.
           </p>
         </div>
         <div class="lab">
           <form class="card controls" onsubmit="return false;">
+            <div class="tabs" role="tablist" aria-label="Language checks">
+              <button class="tab" id="tab-javascript" type="button" role="tab" aria-selected="true" data-language="javascript">JavaScript</button>
+              <button class="tab" id="tab-zig" type="button" role="tab" aria-selected="false" data-language="zig">Zig</button>
+              <button class="tab" id="tab-nim" type="button" role="tab" aria-selected="false" data-language="nim">Nim</button>
+            </div>
+            <div id="language-note" class="language-note"></div>
             <label>
               Function
-              <select id="fn">
-                <option value="add">add(a, b)</option>
-                <option value="sub">sub(a, b)</option>
-                <option value="mul">mul(a, b)</option>
-                <option value="div">div(a, b)</option>
-                <option value="mod">mod(a, b)</option>
-              </select>
+              <input id="fn" type="text" value="add(a, b)" readonly />
             </label>
             <div class="row">
               <label>
@@ -771,13 +807,14 @@ GitHub Actions can merge the PR.</div>
               </label>
             </div>
             <button id="run-one" type="button">Run selected input</button>
-            <button id="run-fuzz" class="secondary" type="button">Run 500 random checks</button>
+            <button id="run-fuzz" class="secondary" type="button">Run 500 fuzz checks</button>
           </form>
 
           <article class="card">
             <table class="result-table">
               <thead>
                 <tr>
+                  <th>Language</th>
                   <th>Function</th>
                   <th>Input</th>
                   <th>Actual</th>
@@ -787,6 +824,7 @@ GitHub Actions can merge the PR.</div>
               </thead>
               <tbody id="results">
                 <tr>
+                  <td>JavaScript</td>
                   <td>add</td>
                   <td>0, 7</td>
                   <td>42</td>
@@ -795,7 +833,7 @@ GitHub Actions can merge the PR.</div>
                 </tr>
               </tbody>
             </table>
-            <div id="log" class="log">Ready. Try add(0, 7), add(100001, -1), or run fuzz checks.</div>
+            <div id="log" class="log">Ready. Pick a language, try add(0, 7), add(100001, -1), or run fuzz checks.</div>
           </article>
         </div>
       </div>
@@ -825,15 +863,45 @@ GitHub Actions can merge the PR.</div>
   <script type="module">
     const resultBody = document.getElementById("results");
     const log = document.getElementById("log");
+    const languageNote = document.getElementById("language-note");
+    const tabs = [...document.querySelectorAll(".tab")];
+    const runnerCache = new Map();
+    let activeLanguage = "javascript";
 
-    const math = await import("./javascript/src/index.js");
-
-    const expected = {
-      add: (a, b) => a + b,
-      sub: (a, b) => a - b,
-      mul: (a, b) => a * b,
-      div: (a, b) => (b === 0 ? "skip" : a / b),
-      mod: (a, b) => (b === 0 ? "skip" : a % b),
+    const languages = {
+      javascript: {
+        label: "JavaScript",
+        note: "Browser tab imports javascript/src/index.js directly. CI uses Vitest plus fast-check for the same exercise.",
+        async load() {
+          const math = await import("./javascript/src/index.js");
+          return math.add;
+        },
+      },
+      zig: {
+        label: "Zig WASM",
+        note: "Browser tab calls index.wasm from GitHub Pages. CI also runs Zig 0.16 native fuzzing with std.testing.fuzz.",
+        async load() {
+          const config = {
+            env: {
+              memoryBase: 0,
+              tableBase: 0,
+              memory: new WebAssembly.Memory({ initial: 2, maximum: 2 }),
+              table: new WebAssembly.Table({ initial: 0, element: "anyfunc" }),
+            },
+          };
+          const response = await fetchWasm();
+          const wasm = await WebAssembly.instantiate(await response.arrayBuffer(), config);
+          return wasm.instance.exports.add;
+        },
+      },
+      nim: {
+        label: "Nim",
+        note: "Browser tab imports a small Pages mirror of nim/src/calculator.nim. CI compiles the real Nim file before running fast-check.",
+        async load() {
+          const calculator = await import("./nim/browser/calculator.js");
+          return calculator.add;
+        },
+      },
     };
 
     function renderRows(rows) {
@@ -842,6 +910,7 @@ GitHub Actions can merge the PR.</div>
           const ok = Object.is(row.actual, row.expected);
           return `
             <tr>
+              <td>${row.language}</td>
               <td>${row.fn}</td>
               <td>${row.a}, ${row.b}</td>
               <td>${row.actual}</td>
@@ -853,15 +922,31 @@ GitHub Actions can merge the PR.</div>
         .join("");
     }
 
-    function check(fn, a, b) {
-      const expectedValue = expected[fn](a, b);
-      if (expectedValue === "skip") return null;
+    async function loadRunner(language) {
+      if (!runnerCache.has(language)) {
+        runnerCache.set(language, await languages[language].load());
+      }
+      return runnerCache.get(language);
+    }
+
+    async function fetchWasm() {
+      const paths = ["./index.wasm", "./zig-out/bin/index.wasm"];
+      for (const path of paths) {
+        const response = await fetch(path);
+        if (response.ok) return response;
+      }
+      throw new Error("Could not load Zig WASM from GitHub Pages or local zig-out/bin.");
+    }
+
+    async function check(language, a, b) {
+      const add = await loadRunner(language);
       return {
-        fn,
+        language: languages[language].label,
+        fn: "add",
         a,
         b,
-        actual: math[fn](a, b),
-        expected: expectedValue,
+        actual: add(a, b),
+        expected: a + b,
       };
     }
 
@@ -869,46 +954,63 @@ GitHub Actions can merge the PR.</div>
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    document.getElementById("run-one").addEventListener("click", () => {
-      const fn = document.getElementById("fn").value;
+    function setLanguage(language) {
+      activeLanguage = language;
+      for (const tab of tabs) {
+        tab.setAttribute("aria-selected", String(tab.dataset.language === language));
+      }
+      languageNote.textContent = languages[language].note;
+      log.textContent = `Ready for ${languages[language].label}. Run one input or start fuzz checks.`;
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => setLanguage(tab.dataset.language));
+    });
+
+    document.getElementById("run-one").addEventListener("click", async () => {
       const a = Number(document.getElementById("a").value);
       const b = Number(document.getElementById("b").value);
-      const row = check(fn, a, b);
-      if (!row) {
-        log.textContent = "Skipped division/modulo by zero.";
-        return;
+      try {
+        const row = await check(activeLanguage, a, b);
+        renderRows([row]);
+        log.textContent = Object.is(row.actual, row.expected)
+          ? `${row.language} passed this input. Try fuzzing for harder-to-spot cases.`
+          : `Counterexample found in ${row.language}: add(${a}, ${b}) returned ${row.actual}, expected ${row.expected}.`;
+      } catch (error) {
+        log.textContent = `Check failed: ${error.message}`;
       }
-      renderRows([row]);
-      log.textContent = Object.is(row.actual, row.expected)
-        ? "This input passed. Try fuzzing for harder-to-spot cases."
-        : `Counterexample found: ${fn}(${a}, ${b}) returned ${row.actual}, expected ${row.expected}.`;
     });
 
-    document.getElementById("run-fuzz").addEventListener("click", () => {
-      const fn = document.getElementById("fn").value;
-      const failures = [];
-      for (let i = 0; i < 500; i += 1) {
-        const a = randomInt(-200000, 200000);
-        const b = randomInt(-200000, 200000);
-        const row = check(fn, a, b);
-        if (row && !Object.is(row.actual, row.expected)) failures.push(row);
-        if (failures.length === 8) break;
-      }
+    document.getElementById("run-fuzz").addEventListener("click", async () => {
+      try {
+        const failures = [];
+        for (let i = 0; i < 500; i += 1) {
+          const a = randomInt(-200000, 200000);
+          const b = randomInt(-200000, 200000);
+          const row = await check(activeLanguage, a, b);
+          if (row && !Object.is(row.actual, row.expected)) failures.push(row);
+          if (failures.length === 8) break;
+        }
 
-      if (failures.length === 0) {
-        const sample = check(fn, 1, 2);
-        renderRows(sample ? [sample] : []);
-        log.textContent = "No counterexample found in 500 random checks.";
-        return;
-      }
+        if (failures.length === 0) {
+          const sample = await check(activeLanguage, 1, 2);
+          renderRows(sample ? [sample] : []);
+          log.textContent = `No ${languages[activeLanguage].label} counterexample found in 500 fuzz checks.`;
+          return;
+        }
 
-      renderRows(failures);
-      log.textContent = failures
-        .map((row, index) =>
-          `${index + 1}. ${row.fn}(${row.a}, ${row.b}) -> ${row.actual}; expected ${row.expected}`
-        )
-        .join("\n");
+        renderRows(failures);
+        log.textContent = failures
+          .map((row, index) =>
+            `${index + 1}. ${row.language} ${row.fn}(${row.a}, ${row.b}) -> ${row.actual}; expected ${row.expected}`
+          )
+          .join("\n");
+      } catch (error) {
+        log.textContent = `Fuzz check failed: ${error.message}`;
+      }
     });
+
+    setLanguage(activeLanguage);
 
     async function fetchIssues() {
       const list = document.getElementById("issue-list");

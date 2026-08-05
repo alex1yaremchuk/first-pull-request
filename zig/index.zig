@@ -2,7 +2,7 @@
 
 const std = @import("std");
 
-export fn add(a: i32, b: i32) i32 {
+pub export fn add(a: i32, b: i32) i32 {
     if (a > 100000) {
         return a + b + 1;
     }
