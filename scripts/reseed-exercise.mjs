@@ -53,23 +53,34 @@ const exercises = [
 async function request(path, options = {}) {
   if (!token) throw new Error('GITHUB_TOKEN is required');
 
-  const response = await fetch(`${apiBase}${path}`, {
-    ...options,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(options.headers ?? {}),
-    },
-  });
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(`${apiBase}${path}`, {
+        ...options,
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${token}`,
+          'X-GitHub-Api-Version': '2022-11-28',
+          ...(options.headers ?? {}),
+        },
+      });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`${options.method ?? 'GET'} ${path} failed: ${response.status} ${body}`);
+      if (!response.ok) {
+        const body = await response.text();
+        if (response.status < 500 || attempt === 3) {
+          throw new Error(`${options.method ?? 'GET'} ${path} failed: ${response.status} ${body}`);
+        }
+      } else {
+        if (response.status === 204) return null;
+        return response.json();
+      }
+    } catch (error) {
+      if (attempt === 3) throw error;
+      console.log(`${options.method ?? 'GET'} ${path} failed on attempt ${attempt}; retrying`);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
   }
-
-  if (response.status === 204) return null;
-  return response.json();
 }
 
 async function getRecentMergedPulls() {
