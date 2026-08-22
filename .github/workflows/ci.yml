@@ -44,23 +44,41 @@ jobs:
         fi
         echo "✔ Branch name is valid."
 
+    - name: Detect reseed pull request
+      id: reseed-pr
+      env:
+        HEAD_REF: ${{ github.head_ref }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
+      run: |
+        if [[ "$HEAD_REF" == chore/reseed-* && "$PR_TITLE" == chore:\ reseed* ]]; then
+          echo "skip=true" >> "$GITHUB_OUTPUT"
+          echo "This is an automatic reseed PR; targeted fix checks are skipped."
+        else
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Setup Node.js
+      if: steps.reseed-pr.outputs.skip != 'true'
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
     - name: Install Node dependencies
+      if: steps.reseed-pr.outputs.skip != 'true'
       run: |
         cd javascript
         npm ci
 
     - name: Install Zig using Snap
+      if: steps.reseed-pr.outputs.skip != 'true'
       run: sudo snap install zig --classic --beta
 
     - name: Build Zig
+      if: steps.reseed-pr.outputs.skip != 'true'
       run: zig build
 
     - name: Extract issue number from PR
+      if: steps.reseed-pr.outputs.skip != 'true'
       id: issue-number
       uses: actions/github-script@v7
       with:
@@ -74,6 +92,7 @@ jobs:
           }
 
     - name: Get issue title
+      if: steps.reseed-pr.outputs.skip != 'true'
       id: issue-title
       uses: actions/github-script@v7
       env:
@@ -89,17 +108,18 @@ jobs:
           core.setOutput('test', data.title.trim().replace(/^Test failed:\s*/, ''));
 
     - name: Install Nim
-      if: startsWith(steps.issue-title.outputs.test, 'nim.')
+      if: steps.reseed-pr.outputs.skip != 'true' && startsWith(steps.issue-title.outputs.test, 'nim.')
       run: sudo apt-get update && sudo apt-get install -y nim
 
     - name: Run property test
+      if: steps.reseed-pr.outputs.skip != 'true'
       id: run-test
       run: |
         cd javascript
         npm test -- tests/${{ steps.issue-title.outputs.test }}.test.js
 
     - name: Comment on success
-      if: steps.run-test.outcome == 'success'
+      if: steps.reseed-pr.outputs.skip != 'true' && steps.run-test.outcome == 'success'
       uses: actions/github-script@v7
       with:
         script: |
@@ -111,7 +131,7 @@ jobs:
           });
 
     - name: Comment on failure
-      if: failure() && steps.run-test.outcome == 'failure'
+      if: steps.reseed-pr.outputs.skip != 'true' && failure() && steps.run-test.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |

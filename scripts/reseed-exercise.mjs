@@ -53,23 +53,34 @@ const exercises = [
 async function request(path, options = {}) {
   if (!token) throw new Error('GITHUB_TOKEN is required');
 
-  const response = await fetch(`${apiBase}${path}`, {
-    ...options,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(options.headers ?? {}),
-    },
-  });
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(`${apiBase}${path}`, {
+        ...options,
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${token}`,
+          'X-GitHub-Api-Version': '2022-11-28',
+          ...(options.headers ?? {}),
+        },
+      });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`${options.method ?? 'GET'} ${path} failed: ${response.status} ${body}`);
+      if (!response.ok) {
+        const body = await response.text();
+        if (response.status < 500 || attempt === 3) {
+          throw new Error(`${options.method ?? 'GET'} ${path} failed: ${response.status} ${body}`);
+        }
+      } else {
+        if (response.status === 204) return null;
+        return response.json();
+      }
+    } catch (error) {
+      if (attempt === 3) throw error;
+      console.log(`${options.method ?? 'GET'} ${path} failed on attempt ${attempt}; retrying`);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
   }
-
-  if (response.status === 204) return null;
-  return response.json();
 }
 
 async function getRecentMergedPulls() {
@@ -98,13 +109,18 @@ async function findPullToReseed() {
   const pulls = await getRecentMergedPulls();
 
   for (const pull of pulls) {
-    if (pull.labels?.some((label) => label.name === reseedLabel)) continue;
-
     const baseText = `${pull.title}\n${pull.body ?? ''}`;
     const linkedIssueText = await getLinkedIssueText(baseText);
     const text = `${baseText}\n${linkedIssueText}`;
     const exercise = exercises.find((item) => text.includes(item.id) || text.includes(item.title));
-    if (exercise) return { pull, exercise };
+    if (!exercise) continue;
+
+    const source = await readFile(exercise.file, 'utf8');
+    const alreadySeeded = source.includes(exercise.seeded);
+    const alreadyLabeled = pull.labels?.some((label) => label.name === reseedLabel);
+
+    if (alreadySeeded && alreadyLabeled) continue;
+    return { pull, exercise, alreadySeeded, alreadyLabeled };
   }
 
   return null;
@@ -136,9 +152,9 @@ async function labelPull(number) {
 async function ensureIssue(exercise) {
   const issues = await request('/issues?state=open&per_page=100');
   const existing = issues.find((issue) => issue.title?.trim() === exercise.title);
-  if (existing) return;
+  if (existing) return existing;
 
-  await request('/issues', {
+  return request('/issues', {
     method: 'POST',
     body: JSON.stringify({
       title: exercise.title,
@@ -149,6 +165,15 @@ async function ensureIssue(exercise) {
         `File to inspect: \`${exercise.file}\``,
       ].join('\n'),
     }),
+  });
+}
+
+async function hasOpenReseedPull(exercise, pull) {
+  const pulls = await request('/pulls?state=open&sort=updated&direction=desc&per_page=50');
+  const expectedTitle = `chore: reseed ${exercise.id}`;
+  return pulls.some((item) => {
+    const body = item.body ?? '';
+    return item.title === expectedTitle && body.includes(`#${pull.number}`);
   });
 }
 
@@ -182,10 +207,22 @@ if (!candidate) {
   process.exit(0);
 }
 
-const changed = await reseed(candidate.exercise);
-await ensureIssue(candidate.exercise);
-await labelPull(candidate.pull.number);
+const issue = await ensureIssue(candidate.exercise);
+if (!candidate.alreadySeeded && await hasOpenReseedPull(candidate.exercise, candidate.pull)) {
+  console.log(`Open reseed pull request already exists for ${candidate.exercise.id} after #${candidate.pull.number}`);
+  await setOutput('changed', 'false');
+  await setOutput('exercise', candidate.exercise.id);
+  await setOutput('pull', String(candidate.pull.number));
+  await setOutput('issue', String(issue.number));
+  process.exit(0);
+}
 
+const changed = candidate.alreadySeeded ? false : await reseed(candidate.exercise);
 await setOutput('changed', changed ? 'true' : 'false');
 await setOutput('exercise', candidate.exercise.id);
 await setOutput('pull', String(candidate.pull.number));
+await setOutput('issue', String(issue.number));
+
+if (!changed) {
+  await labelPull(candidate.pull.number);
+}

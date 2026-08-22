@@ -33,9 +33,43 @@ jobs:
 
       - name: Commit reseeded exercise
         if: steps.reseed.outputs.changed == 'true'
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          branch="chore/reseed-${{ steps.reseed.outputs.exercise }}-after-pr-${{ steps.reseed.outputs.pull }}"
+          branch="${branch//./-}"
+          git checkout -b "$branch"
           git add .
           git commit -m "chore: reseed ${{ steps.reseed.outputs.exercise }}"
-          git push origin main
+          git push --force-with-lease origin "$branch"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Open reseed pull request
+        if: steps.reseed.outputs.changed == 'true'
+        id: pull-request
+        run: |
+          title="chore: reseed ${{ steps.reseed.outputs.exercise }}"
+          body=$(cat <<'BODY'
+          Restores the training bug after the contributor fix has been visible for at least 24 hours.
+
+          Source PR: #${{ steps.reseed.outputs.pull }}
+          Exercise issue: #${{ steps.reseed.outputs.issue }}
+
+          This PR intentionally makes the matching exercise fail again for the next contributor.
+          BODY
+          )
+          pr_url=$(gh pr create \
+            --base main \
+            --head "${{ steps.commit.outputs.branch }}" \
+            --title "$title" \
+            --body "$body")
+          echo "url=$pr_url" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge for reseed pull request
+        if: steps.reseed.outputs.changed == 'true'
+        run: gh pr merge "${{ steps.pull-request.outputs.url }}" --squash --auto --delete-branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
